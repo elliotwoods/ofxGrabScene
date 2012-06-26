@@ -1,8 +1,10 @@
 #pragma once
 
 #include "ofMain.h"
-
 #include "ofxGrabCam.h"
+#include "ofxGrabScene.h"
+
+#include "testNode.h"
 
 class testApp : public ofBaseApp{
 
@@ -13,5 +15,9 @@ public:
 
 	void keyPressed  (int key);
 
+	ofLight light;
 	ofxGrabCam camera;
+	ofxGrabScene scene; 
+	
+	testNode node;
 };

@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		8B1F22461598F3BD0084374B /* Scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1F22451598F3BD0084374B /* Scene.cpp */; };
+		8B1F224C159917480084374B /* Cursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1F224B159917480084374B /* Cursor.cpp */; };
+		8B1F224E159A53580084374B /* Node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1F224D159A53580084374B /* Node.cpp */; };
+		8B1F2251159A53E90084374B /* Handles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1F2250159A53E90084374B /* Handles.cpp */; };
 		8BB05C94146C0DA400E65B31 /* ofxGrabCam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BB05C93146C0DA400E65B31 /* ofxGrabCam.cpp */; };
 		BBAB23CB13894F3D00AA2426 /* GLUT.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
 		E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
@@ -62,6 +65,14 @@
 		8B1F22421598F3940084374B /* ofxGrabScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxGrabScene.h; sourceTree = "<group>"; };
 		8B1F22451598F3BD0084374B /* Scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Scene.cpp; path = ofxGrabScene/Scene.cpp; sourceTree = "<group>"; };
 		8B1F22471598F3C90084374B /* Scene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Scene.h; path = ofxGrabScene/Scene.h; sourceTree = "<group>"; };
+		8B1F22481598F5090084374B /* Node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Node.h; path = ofxGrabScene/Node.h; sourceTree = "<group>"; };
+		8B1F22491598F5280084374B /* Element.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Element.h; path = ofxGrabScene/Element.h; sourceTree = "<group>"; };
+		8B1F224A1598F6420084374B /* Cursor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Cursor.h; path = ofxGrabScene/Cursor.h; sourceTree = "<group>"; };
+		8B1F224B159917480084374B /* Cursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Cursor.cpp; path = ofxGrabScene/Cursor.cpp; sourceTree = "<group>"; };
+		8B1F224D159A53580084374B /* Node.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Node.cpp; path = ofxGrabScene/Node.cpp; sourceTree = "<group>"; };
+		8B1F224F159A53DA0084374B /* Handles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Handles.h; path = ofxGrabScene/Handles.h; sourceTree = "<group>"; };
+		8B1F2250159A53E90084374B /* Handles.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Handles.cpp; path = ofxGrabScene/Handles.cpp; sourceTree = "<group>"; };
+		8B1F2253159A684A0084374B /* testNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = testNode.h; sourceTree = "<group>"; };
 		8BB05C93146C0DA400E65B31 /* ofxGrabCam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ofxGrabCam.cpp; path = ../../../../addons/ofxGrabCam/src/ofxGrabCam.cpp; sourceTree = "<group>"; };
 		8BB05C95146C113600E65B31 /* ofxGrabCam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxGrabCam.h; path = ../../../../addons/ofxGrabCam/src/ofxGrabCam.h; sourceTree = "<group>"; };
 		BBAB23BE13894E4700AA2426 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../libs/glut/lib/osx/GLUT.framework; sourceTree = "<group>"; };
@@ -133,10 +144,25 @@
 		8B1F22441598F3A20084374B /* ofxGrabScene */ = {
 			isa = PBXGroup;
 			children = (
+				8B1F2252159A5CBD0084374B /* Handles */,
 				8B1F22451598F3BD0084374B /* Scene.cpp */,
 				8B1F22471598F3C90084374B /* Scene.h */,
+				8B1F224D159A53580084374B /* Node.cpp */,
+				8B1F22481598F5090084374B /* Node.h */,
+				8B1F22491598F5280084374B /* Element.h */,
+				8B1F224A1598F6420084374B /* Cursor.h */,
+				8B1F224B159917480084374B /* Cursor.cpp */,
+				8B1F224F159A53DA0084374B /* Handles.h */,
+				8B1F2250159A53E90084374B /* Handles.cpp */,
 			);
 			name = ofxGrabScene;
+			sourceTree = "<group>";
+		};
+		8B1F2252159A5CBD0084374B /* Handles */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Handles;
 			sourceTree = "<group>";
 		};
 		8BB05C92146C0D7F00E65B31 /* ofxGrabCam */ = {
@@ -219,6 +245,7 @@
 				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
 				E4B69E1E0A3A1BDC003C02F2 /* testApp.cpp */,
 				E4B69E1F0A3A1BDC003C02F2 /* testApp.h */,
+				8B1F2253159A684A0084374B /* testNode.h */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;
@@ -322,6 +349,9 @@
 				E4B69E210A3A1BDC003C02F2 /* testApp.cpp in Sources */,
 				8BB05C94146C0DA400E65B31 /* ofxGrabCam.cpp in Sources */,
 				8B1F22461598F3BD0084374B /* Scene.cpp in Sources */,
+				8B1F224C159917480084374B /* Cursor.cpp in Sources */,
+				8B1F224E159A53580084374B /* Node.cpp in Sources */,
+				8B1F2251159A53E90084374B /* Handles.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -407,6 +437,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G4;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
 				HEADER_SEARCH_PATHS = "$(OF_CORE_HEADERS)";

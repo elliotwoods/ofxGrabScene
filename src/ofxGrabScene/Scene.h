@@ -6,15 +6,81 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxGrabCam.h"
 
-namespace ofxGrabScene{
+#include "Node.h"
+#include "Element.h"
+#include "Cursor.h"
+
+namespace GrabScene{
 	class Scene : public ofNode {
 	public:
 		Scene();
-		void init();
+		void init(ofxGrabCam & camera);
 		void draw();
 		
+		void add(Element *);
+		void add(Element & element) {
+			this->add(&element);
+		}
+		void add(ofNode & node);
+		
+		// These functions return 0 if nothing found
+		Node * const getSelectedNode() const;
+		void setSelectedNode(Node &);
+		
+		Element * const getElementUnderCursor();
+		
+		ofFbo & getIndexBuffer();
+		const MovingCursor & getCursor();
 	protected:
+		
+		////
+		//graph
+		//
+		///Nodes are important for selection and handles
+		vector<Node*> nodes;
+		
+		///Elements are imporant for any on-screen controls
+		vector<Element*> elements;
+		
+		Node * selection;
+		
+		typedef vector<Node*>::iterator node_iterator;
+		typedef vector<Node*>::const_iterator const_node_iterator;
+		typedef vector<Element*>::iterator element_iterator;
+		typedef vector<Element*>::const_iterator const_element_iterator;
+		//
+		////
+		
+		
+		////
+		//general
+		ofRectangle viewport;
+		ofMatrix4x4 viewMatrix;
+		GLdouble viewDoubles[16];
+		ofMatrix4x4 projectionMatrix;
+		GLdouble projectionDoubles[16];
+		ofxGrabCam * camera;
+		GrabScene::MovingCursor cursor;
+		//
+		////
+		
+		
+		////
+		//index buffer
+		//
+		ofFbo indexBuffer;
+		ofFloatPixels indexPixels; //ideally this should be short, but having troubles with GL_LUMINANCE16 ofFbo
+		bool lockIndex;
+		unsigned short index;
+		int indexCachedFrame;
+		void updateCursorAndIndex();
+		void updateCursorOnly();
+		void updateCursor();
+		//
+		////
+		
 		
 		////
 		//events
@@ -26,9 +92,6 @@ namespace ofxGrabScene{
 		void	mouseDragged(ofMouseEventArgs & args);
 		void	keyPressed(ofKeyEventArgs & args);
 		void	keyReleased(ofKeyEventArgs & args);
-		//
-		bool	initialised;
-		bool	mouseActions;
 		//
 		////
 	};
