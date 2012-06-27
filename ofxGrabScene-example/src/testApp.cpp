@@ -93,7 +93,6 @@ void testApp::draw(){
 	ofDrawGrid(10.0f);
 	scene.getCursor().draw();
 	scene.draw();
-	node.draw();
 	
 	light.disable();
 	ofDisableLighting();

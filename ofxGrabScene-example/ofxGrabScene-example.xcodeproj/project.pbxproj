@@ -144,7 +144,6 @@
 		8B1F22441598F3A20084374B /* ofxGrabScene */ = {
 			isa = PBXGroup;
 			children = (
-				8B1F2252159A5CBD0084374B /* Handles */,
 				8B1F22451598F3BD0084374B /* Scene.cpp */,
 				8B1F22471598F3C90084374B /* Scene.h */,
 				8B1F224D159A53580084374B /* Node.cpp */,
@@ -156,13 +155,6 @@
 				8B1F2250159A53E90084374B /* Handles.cpp */,
 			);
 			name = ofxGrabScene;
-			sourceTree = "<group>";
-		};
-		8B1F2252159A5CBD0084374B /* Handles */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Handles;
 			sourceTree = "<group>";
 		};
 		8BB05C92146C0D7F00E65B31 /* ofxGrabCam */ = {

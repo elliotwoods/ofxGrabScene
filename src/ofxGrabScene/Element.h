@@ -18,6 +18,8 @@ namespace GrabScene {
 		virtual void cursorReleased(const MovingCursor &) { }
 		
 		virtual void cursorDragged(const MovingCursor &) { }
+		
+		virtual bool onTop() const { return false; }
 	};
 	
 	class NullElement : public Element {

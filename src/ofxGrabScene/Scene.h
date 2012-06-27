@@ -11,7 +11,7 @@
 #include "Node.h"
 #include "Element.h"
 #include "Cursor.h"
-
+#define GRABSCENE_ON_TOP_SCALE 0.1f
 namespace GrabScene{
 	class Scene : public ofNode {
 	public:
@@ -64,6 +64,14 @@ namespace GrabScene{
 		ofxGrabCam * camera;
 		GrabScene::MovingCursor cursor;
 		//
+		////
+		
+		
+		////
+		//graphics
+		//
+		void startOnTop() const;
+		void endOnTop() const;
 		////
 		
 		

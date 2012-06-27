@@ -37,10 +37,24 @@ namespace GrabScene {
 	
 	//----------
 	void Scene::draw() {
-		const_element_iterator it;
-		for (it = elements.begin(); it != elements.end(); it++) {
-			(**it).draw();
+		node_iterator itN;
+		for (itN = this->nodes.begin(); itN != this->nodes.end(); itN++) {
+			(*itN)->node->draw();
 		}
+		
+		const_element_iterator it;
+		//standard
+		for (it = elements.begin(); it != elements.end(); it++) {
+			if (!(**it).onTop())
+				(**it).draw();
+		}
+		//onTop
+		startOnTop();
+		for (it = elements.begin(); it != elements.end(); it++) {
+			if ((**it).onTop())
+				(**it).draw();
+		}
+		endOnTop();
 		
 		this->viewport = ofGetCurrentViewport();
 		glGetFloatv(GL_MODELVIEW_MATRIX, viewMatrix.getPtr());
@@ -94,6 +108,25 @@ namespace GrabScene {
 	}
 	
 	//----------
+	void Scene::startOnTop() const {
+		glMatrixMode(GL_PROJECTION);
+		glPushMatrix();
+		ofMatrix4x4 projectionScaled;
+		glGetFloatv(GL_PROJECTION_MATRIX, projectionScaled.getPtr());
+		projectionScaled.postMultScale(ofVec3f(1.0f, 1.0f, GRABSCENE_ON_TOP_SCALE));
+		//glLoadMatrixf(projectionScaled.getPtr());
+		glMatrixMode(GL_MODELVIEW);
+		glClear(GL_DEPTH_BUFFER_BIT);
+	}
+	
+	//----------
+	void Scene::endOnTop() const {
+		glMatrixMode(GL_PROJECTION);
+		glPopMatrix();
+		glMatrixMode(GL_MODELVIEW);
+	}
+	
+	//----------
 	void Scene::updateCursorAndIndex() {
 		if (indexCachedFrame >= ofGetFrameNum())
 			return;
@@ -121,15 +154,25 @@ namespace GrabScene {
 		ofDisableSmoothing();
 		ofDisableAlphaBlending();
 		
-		float drawIndex = 0; //0 is background
 		float scaledValue;
-		const_element_iterator it;
-		for (it = elements.begin(); it != elements.end(); it++) {
-			scaledValue = drawIndex / float(1 << 10);
+		//standard
+		for (int i=0; i<elements.size(); i++) {
+			if (elements[i]->onTop())
+				continue;
+			scaledValue = float(i) / float(1 << 10);
 			glColor3f(scaledValue, scaledValue, scaledValue);
-			(**it).drawStencil();
-			drawIndex++;
+			elements[i]->drawStencil();
 		}
+		//onTop
+		startOnTop();
+		for (int i=0; i<elements.size(); i++) {
+			if (!elements[i]->onTop())
+				continue;
+			scaledValue = float(i) / float(1 << 10);
+			glColor3f(scaledValue, scaledValue, scaledValue);
+			elements[i]->drawStencil();
+		}
+		endOnTop();
 		
 		ofPopStyle();
 		
@@ -243,9 +286,8 @@ namespace GrabScene {
 		this->getElementUnderCursor()->cursorDown(cursor);
 		if (cursor.captured) {
 			this->camera->setMouseActions(false);
-			this->lockIndex = true;
 		}
-
+		this->lockIndex = true;
 	}
 	
 	//----------

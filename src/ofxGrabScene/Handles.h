@@ -21,6 +21,7 @@ namespace GrabScene {
 		class BaseHandle : public Element {
 		public:
 			static void setParent(Node *);
+			bool onTop() const { return true; }
 		protected:
 			static Node * parent;
 		};
