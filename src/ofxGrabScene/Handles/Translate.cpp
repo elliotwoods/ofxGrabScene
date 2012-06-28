@@ -155,6 +155,12 @@ namespace GrabScene {
 		} 
 		ofPopStyle();
 		
+		if (this->rollover) {
+			ofTranslate(0, 0, GRABSCENE_HANDLES_RADIUS_1 + GRABSCENE_HANDLES_RADIUS_2 * 2);
+			ofSetDrawBitmapMode(OF_BITMAPMODE_MODEL_BILLBOARD);
+			ofDrawBitmapString(this->getReading(), ofPoint());
+		}
+		
 		ofPopMatrix();
 	}
 	
@@ -185,5 +191,15 @@ namespace GrabScene {
 		
 		if (this->parent != 0)
 			this->parent->getNode()->move(movement);
+	}
+	
+	//---------
+	string Handles::Translate::getReading() const {
+		if (this->parent == 0)
+			return "";
+		
+		ofNode & node(*this->parent->getNode());
+		
+		return ofToString(node.getPosition().dot(this->getDirection()), 2);
 	}
 }

@@ -31,12 +31,13 @@ namespace GrabScene {
 			static Node * parent;
 			ofColor lineColor;
 			ofColor fillColor;
+			bool rollover;
 			
 			void rotateAxis() const;
 			void setStyleFill() const;
 			void setStyleLine() const;
 		private:
-			bool rollover;
+			virtual string getReading() const = 0;
 		};
 		
 		class Translate : public BaseHandle {
@@ -50,6 +51,7 @@ namespace GrabScene {
 			void cursorDragged(const MovingCursor &);
 			
 		protected:
+			string getReading() const;
 			static ofMesh fill;
 			static ofMesh line;
 		};
@@ -65,6 +67,7 @@ namespace GrabScene {
 			void cursorDragged(const MovingCursor &);
 			
 		protected:
+			string getReading() const;
 			static ofMesh fill;
 			static ofMesh line;
 		};

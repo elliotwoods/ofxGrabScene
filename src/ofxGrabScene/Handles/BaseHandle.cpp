@@ -87,7 +87,7 @@ namespace GrabScene {
 		ofNoFill();
 		ofSetLineWidth(2.0f);
 		if (this->rollover)
-			ofSetColor(255);
+			ofSetColor(255, 255, 255, 255);
 		else
 			ofSetColor(this->lineColor);
 	}

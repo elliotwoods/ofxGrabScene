@@ -86,11 +86,20 @@ namespace GrabScene {
 		ofPushMatrix();
 		
 		ofPushStyle();
+		
 		this->rotateAxis();
 		this->setStyleFill();
 		fill.draw();
 		this->setStyleLine();
 		line.draw();
+
+		ofSetColor(255);
+		if (this->rollover) {
+			ofTranslate(0, GRABSCENE_HANDLES_RADIUS_1 + GRABSCENE_HANDLES_RADIUS_2 * 2);
+			ofSetDrawBitmapMode(OF_BITMAPMODE_MODEL_BILLBOARD);
+			ofDrawBitmapString(this->getReading(), ofPoint());
+		}
+		
 		ofPopStyle();
 		
 		ofPopMatrix();
@@ -138,5 +147,15 @@ namespace GrabScene {
 			angle *= -1.0f;
 		
 		node.rotate(angle, direction);
+	}
+	
+	//---------
+	string Handles::Rotate::getReading() const {
+		if (this->parent == 0)
+			return "";
+		
+		ofNode & node(*this->parent->getNode());
+		
+		return ofToString(node.getOrientationEuler().dot(this->getDirection()), 2);
 	}
 }
