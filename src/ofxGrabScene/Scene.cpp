@@ -13,13 +13,16 @@ namespace GrabScene {
 		this->lockIndex = false;
 		this->selection = 0;
 		this->elements.push_back(new NullElement());
-		indexBuffer.allocate(512, 512, GL_RGB32F);
-		indexPixels.allocate(1, 1, OF_PIXELS_MONO);
+		indexBuffer.allocate(256, 256, GL_RGB32F);
 		
 		Node::handles.init();
 		this->add(Node::handles.translateX);
 		this->add(Node::handles.translateY);
 		this->add(Node::handles.translateZ);
+		this->add(Node::handles.translateC);
+		this->add(Node::handles.rotateX);
+		this->add(Node::handles.rotateY);
+		this->add(Node::handles.rotateZ);
 	}
 	
 	//----------
@@ -116,7 +119,6 @@ namespace GrabScene {
 		projectionScaled.postMultScale(ofVec3f(1.0f, 1.0f, GRABSCENE_ON_TOP_SCALE));
 		//glLoadMatrixf(projectionScaled.getPtr());
 		glMatrixMode(GL_MODELVIEW);
-		glClear(GL_DEPTH_BUFFER_BIT);
 	}
 	
 	//----------
@@ -180,11 +182,11 @@ namespace GrabScene {
 		
 		updateCursor();
 		glDisable(GL_DEPTH_TEST);
-		indexBuffer.end();
 		
 		if (!this->lockIndex) {
-			indexBuffer.readToPixels(indexPixels);
-			unsigned short readIndex = indexPixels[0] * float(1 << 10) + 0.5f;
+			float rawValue;
+			glReadPixels(0, 0, 1, 1, GL_RED, GL_FLOAT, &rawValue);
+			unsigned short readIndex = rawValue * float(1 << 10) + 0.5f;
 			indexCachedFrame = ofGetFrameNum();
 			
 			//perform cursor over, cursor out actions
@@ -199,6 +201,7 @@ namespace GrabScene {
 					this->getElementUnderCursor()->cursorOver(cursor);
 			}
 		}
+		indexBuffer.end();
 	}
 	
 	//----------
@@ -207,15 +210,12 @@ namespace GrabScene {
 		//DO NOT CALL THIS FUNCTION DIRECTLY
 		
 		this->cursor.lastFrame = this->cursor;
-		
-		ofVec2f & screen(this->cursor.screen);
-		ofVec3f & world(this->cursor.world);
 
 		
 		////
 		//screen
-		screen.x = ofGetMouseX();
-		screen.y = ofGetMouseY();
+		this->cursor.screen.x = ofGetMouseX();
+		this->cursor.screen.y = ofGetMouseY();
 		//
 		////
 		
@@ -227,9 +227,9 @@ namespace GrabScene {
 		//we presume we're using the stencil buffer which has 1,1 resolution
 		//in order for this to be true, the update must be called when the fbo is attached
 		glReadPixels(0, 0, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
-		
+
 		if (depth == 1.0f) {
-			world = ofVec3f(0,0,0);
+			this->cursor.world = ofVec3f(0,0,0);
 			
 			this->cursor.worldValid = false;
 		} else {
@@ -241,7 +241,10 @@ namespace GrabScene {
 			viewportInt[2] = this->viewport.width;
 			viewportInt[3] = this->viewport.height;
 			
-			gluUnProject(screen.x, ofGetHeight()-1-screen.y, depth, this->viewDoubles, this->projectionDoubles, viewportInt, c, c+1, c+2);
+			gluUnProject(this->cursor.screen.x,
+				ofGetHeight()-1-this->cursor.screen.y,
+				depth, this->viewDoubles, this->projectionDoubles,
+				viewportInt, c, c+1, c+2);
 			
 			this->cursor.world.x = c[0];
 			this->cursor.world.y = c[1];

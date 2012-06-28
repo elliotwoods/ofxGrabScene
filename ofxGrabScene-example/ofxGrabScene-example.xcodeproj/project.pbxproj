@@ -11,6 +11,9 @@
 		8B1F224C159917480084374B /* Cursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1F224B159917480084374B /* Cursor.cpp */; };
 		8B1F224E159A53580084374B /* Node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1F224D159A53580084374B /* Node.cpp */; };
 		8B1F2251159A53E90084374B /* Handles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1F2250159A53E90084374B /* Handles.cpp */; };
+		8B1F2259159B94490084374B /* Translate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1F2258159B94490084374B /* Translate.cpp */; };
+		8B1F225B159B94700084374B /* Rotate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1F225A159B94700084374B /* Rotate.cpp */; };
+		8B1F225D159BA43D0084374B /* BaseHandle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1F225C159BA43D0084374B /* BaseHandle.cpp */; };
 		8BB05C94146C0DA400E65B31 /* ofxGrabCam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BB05C93146C0DA400E65B31 /* ofxGrabCam.cpp */; };
 		BBAB23CB13894F3D00AA2426 /* GLUT.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
 		E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
@@ -73,6 +76,9 @@
 		8B1F224F159A53DA0084374B /* Handles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Handles.h; path = ofxGrabScene/Handles.h; sourceTree = "<group>"; };
 		8B1F2250159A53E90084374B /* Handles.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Handles.cpp; path = ofxGrabScene/Handles.cpp; sourceTree = "<group>"; };
 		8B1F2253159A684A0084374B /* testNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = testNode.h; sourceTree = "<group>"; };
+		8B1F2258159B94490084374B /* Translate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Translate.cpp; path = ofxGrabScene/Handles/Translate.cpp; sourceTree = "<group>"; };
+		8B1F225A159B94700084374B /* Rotate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Rotate.cpp; path = ofxGrabScene/Handles/Rotate.cpp; sourceTree = "<group>"; };
+		8B1F225C159BA43D0084374B /* BaseHandle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BaseHandle.cpp; path = ofxGrabScene/Handles/BaseHandle.cpp; sourceTree = "<group>"; };
 		8BB05C93146C0DA400E65B31 /* ofxGrabCam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ofxGrabCam.cpp; path = ../../../../addons/ofxGrabCam/src/ofxGrabCam.cpp; sourceTree = "<group>"; };
 		8BB05C95146C113600E65B31 /* ofxGrabCam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxGrabCam.h; path = ../../../../addons/ofxGrabCam/src/ofxGrabCam.h; sourceTree = "<group>"; };
 		BBAB23BE13894E4700AA2426 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../libs/glut/lib/osx/GLUT.framework; sourceTree = "<group>"; };
@@ -144,6 +150,7 @@
 		8B1F22441598F3A20084374B /* ofxGrabScene */ = {
 			isa = PBXGroup;
 			children = (
+				8B1F2254159B24D90084374B /* Handles */,
 				8B1F22451598F3BD0084374B /* Scene.cpp */,
 				8B1F22471598F3C90084374B /* Scene.h */,
 				8B1F224D159A53580084374B /* Node.cpp */,
@@ -155,6 +162,16 @@
 				8B1F2250159A53E90084374B /* Handles.cpp */,
 			);
 			name = ofxGrabScene;
+			sourceTree = "<group>";
+		};
+		8B1F2254159B24D90084374B /* Handles */ = {
+			isa = PBXGroup;
+			children = (
+				8B1F2258159B94490084374B /* Translate.cpp */,
+				8B1F225A159B94700084374B /* Rotate.cpp */,
+				8B1F225C159BA43D0084374B /* BaseHandle.cpp */,
+			);
+			name = Handles;
 			sourceTree = "<group>";
 		};
 		8BB05C92146C0D7F00E65B31 /* ofxGrabCam */ = {
@@ -344,6 +361,9 @@
 				8B1F224C159917480084374B /* Cursor.cpp in Sources */,
 				8B1F224E159A53580084374B /* Node.cpp in Sources */,
 				8B1F2251159A53E90084374B /* Handles.cpp in Sources */,
+				8B1F2259159B94490084374B /* Translate.cpp in Sources */,
+				8B1F225B159B94700084374B /* Rotate.cpp in Sources */,
+				8B1F225D159BA43D0084374B /* BaseHandle.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

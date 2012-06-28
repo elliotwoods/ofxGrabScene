@@ -9,6 +9,9 @@
 class testNode : public ofNode {
 public:
 	void customDraw() {
-		ofSphere(0.5f);
+		ofPushStyle();
+		ofSetColor(150,150,150);
+		ofBox(0.7f);
+		ofPopStyle();
 	}
 };

@@ -79,7 +79,6 @@ namespace GrabScene{
 		//index buffer
 		//
 		ofFbo indexBuffer;
-		ofFloatPixels indexPixels; //ideally this should be short, but having troubles with GL_LUMINANCE16 ofFbo
 		bool lockIndex;
 		unsigned short index;
 		int indexCachedFrame;
