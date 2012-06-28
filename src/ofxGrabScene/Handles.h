@@ -8,6 +8,9 @@
 #include "Node.h"
 #define GRABSCENE_HANDLES_RADIUS_1 1.0f
 #define GRABSCENE_HANDLES_RADIUS_2 0.1f
+#define GRABSCENE_HANDLES_SATURATION 200
+#define GRABSCENE_HANDLES_LINE_BRIGHTNESS 50
+#define GRABSCENE_HANDLES_FILL_BRIGHTNESS 200
 
 namespace GrabScene {
 	class Node;
@@ -26,7 +29,8 @@ namespace GrabScene {
 		protected:
 			Axis axis;
 			static Node * parent;
-			ofColor color;
+			ofColor lineColor;
+			ofColor fillColor;
 			
 			void rotateAxis() const;
 			void setStyleFill() const;

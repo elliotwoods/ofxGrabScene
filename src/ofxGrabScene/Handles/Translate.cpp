@@ -19,16 +19,17 @@ namespace GrabScene {
 	void Handles::Translate::init() {		
 		const float length = GRABSCENE_HANDLES_RADIUS_1;
 		const float radius = GRABSCENE_HANDLES_RADIUS_2;
+		const float width = GRABSCENE_HANDLES_RADIUS_2 * 2.0f / 3.0f;
 		
-		line.addVertex(ofVec3f(-radius,-radius, radius)); //0
-		line.addVertex(ofVec3f(+radius,-radius, radius)); //1
-		line.addVertex(ofVec3f(+radius,+radius, radius)); //2
-		line.addVertex(ofVec3f(-radius,+radius, radius)); //3
+		line.addVertex(ofVec3f(-width,-width, radius)); //0
+		line.addVertex(ofVec3f(+width,-width, radius)); //1
+		line.addVertex(ofVec3f(+width,+width, radius)); //2
+		line.addVertex(ofVec3f(-width,+width, radius)); //3
 		
-		line.addVertex(ofVec3f(-radius,-radius, length - radius)); //4
-		line.addVertex(ofVec3f(+radius,-radius, length - radius)); //5
-		line.addVertex(ofVec3f(+radius,+radius, length - radius)); //6
-		line.addVertex(ofVec3f(-radius,+radius, length - radius)); //7
+		line.addVertex(ofVec3f(-width,-width, length - radius)); //4
+		line.addVertex(ofVec3f(+width,-width, length - radius)); //5
+		line.addVertex(ofVec3f(+width,+width, length - radius)); //6
+		line.addVertex(ofVec3f(-width,+width, length - radius)); //7
 		
 		line.addVertex(ofVec3f(0.0f, 0.0f, length)); //8
 		

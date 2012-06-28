@@ -62,9 +62,9 @@ namespace GrabScene {
 		
 		
 		//fill
-		for (int i=0; i<resolution; i++) {
-			fill.addIndex(i);
-			fill.addIndex(i+resolution);
+		for (int i=0; i<resolution+1; i++) {
+			fill.addIndex(i % resolution);
+			fill.addIndex((i % resolution) + resolution);
 		}
 		//
 		////

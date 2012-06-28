@@ -53,6 +53,7 @@ namespace GrabScene {
 		}
 		//onTop
 		startOnTop();
+		glClear(GL_DEPTH_BUFFER_BIT);
 		for (it = elements.begin(); it != elements.end(); it++) {
 			if ((**it).onTop())
 				(**it).draw();
