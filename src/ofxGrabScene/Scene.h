@@ -26,6 +26,7 @@ namespace GrabScene{
 		void add(ofNode & node);
 		
 		// These functions return 0 if nothing found
+		bool hasValidSelection() const;
 		Node * const getSelectedNode() const;
 		void setSelectedNode(Node &);
 		
@@ -70,8 +71,8 @@ namespace GrabScene{
 		////
 		//graphics
 		//
-		void startOnTop() const;
-		void endOnTop() const;
+		void drawFrameBuffer();
+		ofFbo frameBuffer;
 		////
 		
 		

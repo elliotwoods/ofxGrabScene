@@ -7,6 +7,7 @@
 namespace GrabScene {
 	//---------
 	Node * Handles::BaseHandle::parent = 0;
+	float Handles::BaseHandle::scale = 1.0f;
 	
 	//---------
 	Handles::BaseHandle::BaseHandle(Axis axis) {
@@ -31,7 +32,7 @@ namespace GrabScene {
 				
 			case NO_AXIS:
 				this->fillColor = ofColor(200,200,200);
-				this->lineColor = ofColor(255,255,255);
+				this->lineColor = ofColor(GRABSCENE_HANDLES_LINE_BRIGHTNESS,GRABSCENE_HANDLES_LINE_BRIGHTNESS,GRABSCENE_HANDLES_LINE_BRIGHTNESS);
 				break;
 		}
 	}
@@ -102,4 +103,8 @@ namespace GrabScene {
 		this->rollover = false;		
 	}
 	
+	//---------
+	void Handles::BaseHandle::setScale(float scale) {
+		Handles::BaseHandle::scale = scale;
+	}
 }

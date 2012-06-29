@@ -40,25 +40,53 @@ namespace GrabScene {
 	
 	//----------
 	void Scene::draw() {
+		
+		ofPushStyle();
+		ofEnableAlphaBlending();
+		
+		////
+		//standard
 		node_iterator itN;
 		for (itN = this->nodes.begin(); itN != this->nodes.end(); itN++) {
 			(*itN)->node->draw();
 		}
 		
 		const_element_iterator it;
-		//standard
 		for (it = elements.begin(); it != elements.end(); it++) {
 			if (!(**it).onTop())
 				(**it).draw();
 		}
+		//
+		////
+		
+		////
 		//onTop
-		startOnTop();
-		glClear(GL_DEPTH_BUFFER_BIT);
+		GLboolean hadLighting;
+		glGetBooleanv(GL_LIGHTING, &hadLighting);
+		if (hadLighting)
+			ofDisableLighting();
+		
+		if (frameBuffer.getWidth() != ofGetWidth() || frameBuffer.getHeight() != ofGetHeight()) {
+			frameBuffer.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA, 4);
+		}
+		frameBuffer.bind();
+		
+		glClearColor(0, 0, 0, 0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		for (it = elements.begin(); it != elements.end(); it++) {
 			if ((**it).onTop())
 				(**it).draw();
 		}
-		endOnTop();
+		
+		frameBuffer.unbind();
+		drawFrameBuffer();
+		
+		if (hadLighting)
+			ofEnableLighting();
+		//
+		////
+		
+		ofPopStyle();
 		
 		this->viewport = ofGetCurrentViewport();
 		glGetFloatv(GL_MODELVIEW_MATRIX, viewMatrix.getPtr());
@@ -77,7 +105,15 @@ namespace GrabScene {
 		this->nodes.push_back(new Node(node));
 		this->setSelectedNode(*nodes.back());
 	}
-	
+
+	//----------
+	bool Scene::hasValidSelection() const {
+		if (this->selection == 0)
+			return false;
+		if (this->selection->getNode() == 0)
+			return false;
+		return true;
+	}
 	//----------
 	Node * const Scene::getSelectedNode() const {
 		return this->selection;
@@ -112,21 +148,21 @@ namespace GrabScene {
 	}
 	
 	//----------
-	void Scene::startOnTop() const {
+	void Scene::drawFrameBuffer() {
+		glDisable(GL_DEPTH_FUNC);
+		glMatrixMode(GL_MODELVIEW);
+		glPushMatrix();
+		glLoadIdentity();
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
-		ofMatrix4x4 projectionScaled;
-		glGetFloatv(GL_PROJECTION_MATRIX, projectionScaled.getPtr());
-		projectionScaled.postMultScale(ofVec3f(1.0f, 1.0f, GRABSCENE_ON_TOP_SCALE));
-		//glLoadMatrixf(projectionScaled.getPtr());
-		glMatrixMode(GL_MODELVIEW);
-	}
-	
-	//----------
-	void Scene::endOnTop() const {
-		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		
+		frameBuffer.draw(-1, -1, 2, 2);
+		
 		glPopMatrix();
 		glMatrixMode(GL_MODELVIEW);
+		glPopMatrix();
+		glEnable(GL_DEPTH_FUNC);
 	}
 	
 	//----------
@@ -167,7 +203,6 @@ namespace GrabScene {
 			elements[i]->drawStencil();
 		}
 		//onTop
-		startOnTop();
 		for (int i=0; i<elements.size(); i++) {
 			if (!elements[i]->onTop())
 				continue;
@@ -175,7 +210,6 @@ namespace GrabScene {
 			glColor3f(scaledValue, scaledValue, scaledValue);
 			elements[i]->drawStencil();
 		}
-		endOnTop();
 		
 		ofPopStyle();
 		
@@ -262,7 +296,7 @@ namespace GrabScene {
 		ofVec3f screenDiffNorm = this->cursor.getScreenFrameDifference() / ofVec2f(viewport.width, -viewport.height);
 		this->cursor.worldViewFrameDifference = screenDiffNorm * viewMatrix.getInverse().getRotate();
 		float distance = (this->camera->getPosition() - this->cursor.world).length();
-		this->cursor.worldViewFrameDifference *= distance * tan(this->camera->getFov() * DEG_TO_RAD / 2.0f) * 2.0f;
+		this->cursor.worldViewFrameDifference *= distance * tan(this->camera->getFov() * DEG_TO_RAD / 2.0f) * 2.0f * 2.0f;
 		//
 		///
 
@@ -272,6 +306,12 @@ namespace GrabScene {
 	//----------
 	void Scene::update(ofEventArgs & args) {
 		this->updateCursorAndIndex();
+		
+		if (this->hasValidSelection()) {
+			float distanceToNode = (this->camera->getPosition() - this->selection->getNode()->getPosition()).length();
+			float planeHeight = tan(camera->getFov() * DEG_TO_RAD / 2.0f) * 2.0f * distanceToNode;
+			Handles::BaseHandle::setScale(planeHeight / 8.0f);
+		}
 	}
 	
 	
@@ -279,15 +319,20 @@ namespace GrabScene {
 	void Scene::mouseMoved(ofMouseEventArgs & args) {
 		this->updateCursorAndIndex();
 		this->getElementUnderCursor();
+		
+		//help ofxGrabCam by using our version of the world cursor
+		if (this->cursor.world != ofVec3f(0,0,0))
+			this->camera->setCursorWorld(this->cursor.world);
 	}
 	
 	//----------
 	void Scene::mousePressed(ofMouseEventArgs & args) {
 		this->updateCursorAndIndex();
 		this->cursor.start(args.button);
-		this->cursor.captured = true;
+		this->cursor.captured = args.button == 0 && !ofGetKeyPressed();
 		
 		this->getElementUnderCursor()->cursorDown(cursor);
+		
 		if (cursor.captured) {
 			this->camera->setMouseActions(false);
 		}
@@ -305,8 +350,10 @@ namespace GrabScene {
 	
 	//----------
 	void Scene::mouseDragged(ofMouseEventArgs & args) {
-		this->updateCursorAndIndex();
-		this->getElementUnderCursor()->cursorDragged(this->cursor);
+		if (this->cursor.captured) {
+			this->updateCursorAndIndex();
+			this->getElementUnderCursor()->cursorDragged(this->cursor);
+		}
 	}
 	
 	

@@ -84,6 +84,7 @@ namespace GrabScene {
 		
 		parent->getNode()->transformGL();
 		ofPushMatrix();
+		ofScale(scale, scale, scale);
 		
 		ofPushStyle();
 		
@@ -113,6 +114,7 @@ namespace GrabScene {
 		
 		parent->getNode()->transformGL();
 		ofPushMatrix();
+		ofScale(scale, scale, scale);
 		
 		this->rotateAxis();
 		fill.draw();

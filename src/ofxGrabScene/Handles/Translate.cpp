@@ -21,10 +21,10 @@ namespace GrabScene {
 		const float radius = GRABSCENE_HANDLES_RADIUS_2;
 		const float width = GRABSCENE_HANDLES_RADIUS_2 * 2.0f / 3.0f;
 		
-		line.addVertex(ofVec3f(-width,-width, radius)); //0
-		line.addVertex(ofVec3f(+width,-width, radius)); //1
-		line.addVertex(ofVec3f(+width,+width, radius)); //2
-		line.addVertex(ofVec3f(-width,+width, radius)); //3
+		line.addVertex(ofVec3f(-width,-width, radius * 2)); //0
+		line.addVertex(ofVec3f(+width,-width, radius * 2)); //1
+		line.addVertex(ofVec3f(+width,+width, radius * 2)); //2
+		line.addVertex(ofVec3f(-width,+width, radius * 2)); //3
 		
 		line.addVertex(ofVec3f(-width,-width, length - radius)); //4
 		line.addVertex(ofVec3f(+width,-width, length - radius)); //5
@@ -136,14 +136,15 @@ namespace GrabScene {
 		
 		ofPushMatrix();
 		ofTranslate(parent->getNode()->getPosition());
+		ofScale(scale, scale, scale);
 		
 		ofPushStyle();
 		if (this->axis == NO_AXIS) {
 			this->setStyleFill();
-			ofBox(GRABSCENE_HANDLES_RADIUS_2);
+			ofBox(GRABSCENE_HANDLES_RADIUS_2 * 2);
 			
 			this->setStyleLine();
-			ofBox(GRABSCENE_HANDLES_RADIUS_2);
+			ofBox(GRABSCENE_HANDLES_RADIUS_2 * 2);
 		} else {
 			this->rotateAxis();
 			this->setStyleFill();
@@ -171,6 +172,7 @@ namespace GrabScene {
 		
 		ofPushMatrix();
 		ofTranslate(parent->getNode()->getPosition());
+		ofScale(scale, scale, scale);
 		
 		if (this->axis == NO_AXIS) {
 			ofBox(GRABSCENE_HANDLES_RADIUS_2);
@@ -186,7 +188,13 @@ namespace GrabScene {
 	//---------
 	void Handles::Translate::cursorDragged(const MovingCursor & cursor) {
 		ofVec3f direction = this->getDirection();
-		ofVec3f movement = cursor.worldViewFrameDifference.dot(direction) * direction;
+		ofVec3f movement;
+		if (this->axis == NO_AXIS) {
+			movement = cursor.worldViewFrameDifference;
+		} else {
+			movement = cursor.worldViewFrameDifference.dot(direction) * direction;
+		}
+		
 		cout << "Movement: " << movement << endl;
 		
 		if (this->parent != 0)
@@ -200,6 +208,15 @@ namespace GrabScene {
 		
 		ofNode & node(*this->parent->getNode());
 		
-		return ofToString(node.getPosition().dot(this->getDirection()), 2);
+		if (this->axis == NO_AXIS) {
+			string reading;
+			ofVec3f position = node.getPosition();
+			reading += ofToString(position.x, 2) + ", ";
+			reading += ofToString(position.y, 2) + ", ";
+			reading += ofToString(position.z, 2);
+			return reading;
+		} else {
+			return ofToString(node.getPosition().dot(this->getDirection()), 2);
+		}
 	}
 }

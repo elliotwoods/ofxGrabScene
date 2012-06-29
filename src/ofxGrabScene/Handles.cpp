@@ -5,11 +5,6 @@
 #include "Handles.h"
 
 namespace GrabScene {
-#pragma mark BaseHandle
-	
-#pragma mark Translate
-	
-#pragma mark Handles
 	//---------
 	Handles::Handles() :
 	translateX(X_AXIS),

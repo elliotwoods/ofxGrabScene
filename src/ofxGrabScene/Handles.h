@@ -26,12 +26,15 @@ namespace GrabScene {
 			static void setParent(Node * node);
 			void cursorOver(const Cursor &);
 			void cursorOut(const Cursor &);
+			bool onTop() const { return true; }
+			static void setScale(float scale);
 		protected:
 			Axis axis;
 			static Node * parent;
 			ofColor lineColor;
 			ofColor fillColor;
 			bool rollover;
+			static float scale;
 			
 			void rotateAxis() const;
 			void setStyleFill() const;
