@@ -71,13 +71,13 @@ namespace GrabScene{
 		////
 		//graphics
 		//
-		void drawFrameBuffer();
+		void drawFrameBuffer(ofFbo &);
 		ofFbo frameBuffer;
 		////
 		
 		
 		////
-		//index buffer
+		//element index buffer
 		//
 		ofFbo indexBuffer;
 		bool lockIndex;
@@ -86,6 +86,14 @@ namespace GrabScene{
 		void updateCursorAndIndex();
 		void updateCursorOnly();
 		void updateCursor();
+		//
+		////
+		
+		
+		////
+		//node index buffer
+		//
+		ofFbo nodeIndexBuffer;
 		//
 		////
 		

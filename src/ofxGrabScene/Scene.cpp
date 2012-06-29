@@ -13,8 +13,8 @@ namespace GrabScene {
 		this->lockIndex = false;
 		this->selection = 0;
 		this->elements.push_back(new NullElement());
-		indexBuffer.allocate(256, 256, GL_RGB32F);
-		
+		indexBuffer.allocate(512, 512, GL_RGB32F);
+
 		Node::handles.init();
 		this->add(Node::handles.translateX);
 		this->add(Node::handles.translateY);
@@ -59,6 +59,7 @@ namespace GrabScene {
 		//
 		////
 		
+		
 		////
 		//onTop
 		GLboolean hadLighting;
@@ -79,10 +80,26 @@ namespace GrabScene {
 		}
 		
 		frameBuffer.unbind();
-		drawFrameBuffer();
+		drawFrameBuffer(frameBuffer);
 		
 		if (hadLighting)
 			ofEnableLighting();
+		//
+		////
+		
+		
+		////
+		//nodeindexbuffer
+		if (nodeIndexBuffer.getWidth() != ofGetWidth() || nodeIndexBuffer.getHeight() != ofGetHeight()) {
+			nodeIndexBuffer.allocate(ofGetWidth(), ofGetHeight(), GL_RGB32F);
+		}
+		nodeIndexBuffer.bind();
+		int index = 0;
+		for (itN = this->nodes.begin(); itN != this->nodes.end(); itN++) {
+			glColor4f(float(index) / float(1 << 10), 0, 0, 1);
+			index++;
+		}
+		nodeIndexBuffer.unbind();
 		//
 		////
 		
@@ -148,7 +165,7 @@ namespace GrabScene {
 	}
 	
 	//----------
-	void Scene::drawFrameBuffer() {
+	void Scene::drawFrameBuffer(ofFbo & fbo) {
 		glDisable(GL_DEPTH_FUNC);
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
@@ -157,7 +174,9 @@ namespace GrabScene {
 		glPushMatrix();
 		glLoadIdentity();
 		
-		frameBuffer.draw(-1, -1, 2, 2);
+		glTranslatef(0, 0, -0.99f);
+		glColor4f(1.0f, 1.0f, 1.0f, 0.8f);
+		fbo.draw(-1, -1, 2, 2);
 		
 		glPopMatrix();
 		glMatrixMode(GL_MODELVIEW);
@@ -241,8 +260,6 @@ namespace GrabScene {
 	
 	//----------
 	void Scene::updateCursor() {
-		
-		//DO NOT CALL THIS FUNCTION DIRECTLY
 		
 		this->cursor.lastFrame = this->cursor;
 

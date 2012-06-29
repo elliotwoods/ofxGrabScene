@@ -14,6 +14,7 @@
 		8B1F2259159B94490084374B /* Translate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1F2258159B94490084374B /* Translate.cpp */; };
 		8B1F225B159B94700084374B /* Rotate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1F225A159B94700084374B /* Rotate.cpp */; };
 		8B1F225D159BA43D0084374B /* BaseHandle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1F225C159BA43D0084374B /* BaseHandle.cpp */; };
+		8B25E4B2159E1E1E00FF66BC /* Assets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B25E4B1159E1E1E00FF66BC /* Assets.cpp */; };
 		8BB05C94146C0DA400E65B31 /* ofxGrabCam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BB05C93146C0DA400E65B31 /* ofxGrabCam.cpp */; };
 		BBAB23CB13894F3D00AA2426 /* GLUT.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
 		E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
@@ -79,6 +80,8 @@
 		8B1F2258159B94490084374B /* Translate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Translate.cpp; path = ofxGrabScene/Handles/Translate.cpp; sourceTree = "<group>"; };
 		8B1F225A159B94700084374B /* Rotate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Rotate.cpp; path = ofxGrabScene/Handles/Rotate.cpp; sourceTree = "<group>"; };
 		8B1F225C159BA43D0084374B /* BaseHandle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BaseHandle.cpp; path = ofxGrabScene/Handles/BaseHandle.cpp; sourceTree = "<group>"; };
+		8B25E4B1159E1E1E00FF66BC /* Assets.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Assets.cpp; path = ofxGrabScene/Assets.cpp; sourceTree = "<group>"; };
+		8B25E4B3159E1E2A00FF66BC /* Assets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Assets.h; path = ofxGrabScene/Assets.h; sourceTree = "<group>"; };
 		8BB05C93146C0DA400E65B31 /* ofxGrabCam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ofxGrabCam.cpp; path = ../../../../addons/ofxGrabCam/src/ofxGrabCam.cpp; sourceTree = "<group>"; };
 		8BB05C95146C113600E65B31 /* ofxGrabCam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxGrabCam.h; path = ../../../../addons/ofxGrabCam/src/ofxGrabCam.h; sourceTree = "<group>"; };
 		BBAB23BE13894E4700AA2426 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../libs/glut/lib/osx/GLUT.framework; sourceTree = "<group>"; };
@@ -160,6 +163,8 @@
 				8B1F224B159917480084374B /* Cursor.cpp */,
 				8B1F224F159A53DA0084374B /* Handles.h */,
 				8B1F2250159A53E90084374B /* Handles.cpp */,
+				8B25E4B1159E1E1E00FF66BC /* Assets.cpp */,
+				8B25E4B3159E1E2A00FF66BC /* Assets.h */,
 			);
 			name = ofxGrabScene;
 			sourceTree = "<group>";
@@ -364,6 +369,7 @@
 				8B1F2259159B94490084374B /* Translate.cpp in Sources */,
 				8B1F225B159B94700084374B /* Rotate.cpp in Sources */,
 				8B1F225D159BA43D0084374B /* BaseHandle.cpp in Sources */,
+				8B25E4B2159E1E1E00FF66BC /* Assets.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

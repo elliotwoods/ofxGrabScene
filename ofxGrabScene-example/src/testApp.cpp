@@ -22,21 +22,18 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	ofBackground(50);
+	ofBackground(40);
 	camera.begin();
 	light.enable();
 	
 	ofDrawGrid(10.0f);
-	//scene.getCursor().draw();
 	scene.draw();
 	
 	light.disable();
 	ofDisableLighting();
 	camera.end();
 	
-	glColor3f(100.0f, 100.0f, 100.0f);
-	scene.getIndexBuffer().draw(0,0);
-	glColor3f(1.0f, 1.0f, 1.0f);
+//	scene.getIndexBuffer().draw(0,0);
 }
 
 //--------------------------------------------------------------
