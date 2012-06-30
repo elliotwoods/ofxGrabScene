@@ -5,15 +5,22 @@ void testApp::setup(){
 	ofEnableSmoothing();
 	ofSetVerticalSync(true);
 	
+	for (int i=0; i<30; i++) {
+		nodes.push_back(testNode());
+		nodes.back().setPosition(ofRandom(-3.0f, +3.0f), ofRandom(-3.0f, +3.0f), ofRandom(-3.0f, +3.0f));
+		nodes.back().rotate(ofRandom(180.0f), ofVec3f(ofRandom(1.0f), ofRandom(1.0f), ofRandom(1.0f)));
+	}
+	
 	scene.init(camera);
-	scene.add(node1);
-	scene.add(node2);
+	for (int i=0; i<nodes.size(); i++)
+		scene.add(nodes[i]);
 	
 	camera.setPosition(2.0f, 2.0f, 2.0f);
 	camera.lookAt(ofVec3f(0.0f, 0.0f, 0.0f));
 	
 	light.setPointLight();
 	light.setPosition(-3.0f, 3.0f, 3.0f);
+	light.setAttenuation();
 }
 
 //--------------------------------------------------------------

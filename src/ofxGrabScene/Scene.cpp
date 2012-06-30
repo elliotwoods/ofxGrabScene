@@ -117,6 +117,7 @@ namespace GrabScene {
 		ofShader & outlineShader(shader("outlineIndex"));
 		outlineShader.begin();
 		outlineShader.setUniform1i("selection", this->selectedNode);
+		outlineShader.setUniform1i("hover", this->nodeUnderCursor);
 		outlineShader.setUniform1f("valueOffset", 1 << 10);
 		outlineShader.setUniformTexture("texIndex", nodeIndexBuffer, 2);
 		drawFullscreen(nodeIndexBuffer);
@@ -142,7 +143,6 @@ namespace GrabScene {
 	void Scene::add(ofNode & node) {
 		BaseNode * newNode = new WrappedNode(node);
 		this->nodes.push_back(newNode);
-		this->setSelectedNode(this->nodes.size() - 1);
 	}
 
 	//----------
@@ -431,7 +431,7 @@ namespace GrabScene {
 		this->lockIndex = false;
 		
 		//click
-		if (!this->cursor.dragged) {
+		if (!this->cursor.dragged && this->index==0) {
 			this->setSelectedNode(nodeUnderCursor);
 		}
 	}
