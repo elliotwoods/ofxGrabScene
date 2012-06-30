@@ -11,7 +11,11 @@
 #include "Node.h"
 #include "Element.h"
 #include "Cursor.h"
-#define GRABSCENE_ON_TOP_SCALE 0.1f
+#include "Assets.h"
+#include "Handles.h"
+
+#define GRABSCENE_INDEX_VALUE_SCALE (1 << 10)
+
 namespace GrabScene{
 	class Scene : public ofNode {
 	public:
@@ -25,12 +29,12 @@ namespace GrabScene{
 		}
 		void add(ofNode & node);
 		
-		// These functions return 0 if nothing found
-		bool hasValidSelection() const;
-		Node * const getSelectedNode() const;
-		void setSelectedNode(Node &);
+		bool hasSelection() const;
+		BaseNode & getSelectedNode();
+		void setSelectedNode(BaseNode &);
+		void setSelectedNode(const unsigned int index);
 		
-		Element * const getElementUnderCursor();
+		Element & getElementUnderCursor();
 		
 		ofFbo & getIndexBuffer();
 		const MovingCursor & getCursor();
@@ -40,15 +44,13 @@ namespace GrabScene{
 		//graph
 		//
 		///Nodes are important for selection and handles
-		vector<Node*> nodes;
+		vector<BaseNode*> nodes;
 		
 		///Elements are imporant for any on-screen controls
 		vector<Element*> elements;
 		
-		Node * selection;
-		
-		typedef vector<Node*>::iterator node_iterator;
-		typedef vector<Node*>::const_iterator const_node_iterator;
+		typedef vector<BaseNode*>::iterator node_iterator;
+		typedef vector<BaseNode*>::const_iterator const_node_iterator;
 		typedef vector<Element*>::iterator element_iterator;
 		typedef vector<Element*>::const_iterator const_element_iterator;
 		//
@@ -71,7 +73,7 @@ namespace GrabScene{
 		////
 		//graphics
 		//
-		void drawFrameBuffer(ofFbo &);
+		void drawFullscreen(ofBaseHasTexture &);
 		ofFbo frameBuffer;
 		////
 		
@@ -91,9 +93,12 @@ namespace GrabScene{
 		
 		
 		////
-		//node index buffer
+		//node interaction
 		//
 		ofFbo nodeIndexBuffer;
+		Handles handles;
+		unsigned int selectedNode; //0 = no selection
+		unsigned int nodeUnderCursor;
 		//
 		////
 		
@@ -108,6 +113,7 @@ namespace GrabScene{
 		void	mouseDragged(ofMouseEventArgs & args);
 		void	keyPressed(ofKeyEventArgs & args);
 		void	keyReleased(ofKeyEventArgs & args);
+		void	assetsLoad(Assets &);
 		//
 		////
 	};

@@ -6,6 +6,8 @@
 
 #include "Element.h"
 #include "Node.h"
+#include "Assets.h"
+
 #define GRABSCENE_HANDLES_RADIUS_1 1.0f
 #define GRABSCENE_HANDLES_RADIUS_2 0.08f
 #define GRABSCENE_HANDLES_SATURATION 200
@@ -13,8 +15,6 @@
 #define GRABSCENE_HANDLES_FILL_BRIGHTNESS 200
 
 namespace GrabScene {
-	class Node;
-	
 	class Handles {
 	public:
 		enum Axis { X_AXIS, Y_AXIS, Z_AXIS, NO_AXIS };
@@ -23,18 +23,21 @@ namespace GrabScene {
 		public:
 			BaseHandle(Axis);
 			ofVec3f getDirection() const;
-			static void setParent(Node * node);
+			static void setParent(BaseNode * node);
 			void cursorOver(const Cursor &);
 			void cursorOut(const Cursor &);
 			bool onTop() const { return true; }
 			static void setScale(float scale);
+			static void enable();
+			static void disable();
 		protected:
 			Axis axis;
-			static Node * parent;
+			static BaseNode * parent;
 			ofColor lineColor;
 			ofColor fillColor;
 			bool rollover;
 			static float scale;
+			static bool enabled;
 			
 			void rotateAxis() const;
 			void setStyleFill() const;

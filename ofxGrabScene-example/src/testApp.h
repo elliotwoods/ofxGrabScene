@@ -19,5 +19,5 @@ public:
 	ofxGrabCam camera;
 	ofxGrabScene scene; 
 	
-	testNode node;
+	testNode node1, node2;
 };

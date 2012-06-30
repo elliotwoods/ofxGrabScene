@@ -131,13 +131,18 @@ namespace GrabScene {
 	
 	//---------
 	void Handles::Translate::draw() const {
-		if (parent == 0)
+		if (parent == 0 || !this->enabled)
 			return;
 		
-		ofPushMatrix();
-		ofTranslate(parent->getNode()->getPosition());
-		ofScale(scale, scale, scale);
+		GLboolean hadLighting;
+		glGetBooleanv(GL_LIGHTING, &hadLighting);
+		if (hadLighting)
+			ofDisableLighting();
 		
+		ofPushMatrix();
+		ofTranslate(parent->getNode().getPosition());
+		ofScale(scale, scale, scale);
+								 
 		ofPushStyle();
 		if (this->axis == NO_AXIS) {
 			this->setStyleFill();
@@ -153,7 +158,7 @@ namespace GrabScene {
 			this->setStyleLine();
 			line.draw();
 			
-		} 
+		}
 		ofPopStyle();
 		
 		if (this->rollover) {
@@ -163,15 +168,18 @@ namespace GrabScene {
 		}
 		
 		ofPopMatrix();
+		
+		if (hadLighting)
+			ofEnableLighting();
 	}
 	
 	//---------
 	void Handles::Translate::drawStencil() const {
-		if (parent == 0)
+		if (parent == 0 || !this->enabled)
 			return;
 		
 		ofPushMatrix();
-		ofTranslate(parent->getNode()->getPosition());
+		ofTranslate(parent->getNode().getPosition());
 		ofScale(scale, scale, scale);
 		
 		if (this->axis == NO_AXIS) {
@@ -195,10 +203,8 @@ namespace GrabScene {
 			movement = cursor.worldViewFrameDifference.dot(direction) * direction;
 		}
 		
-		cout << "Movement: " << movement << endl;
-		
 		if (this->parent != 0)
-			this->parent->getNode()->move(movement);
+			this->parent->getNode().move(movement);
 	}
 	
 	//---------
@@ -206,7 +212,7 @@ namespace GrabScene {
 		if (this->parent == 0)
 			return "";
 		
-		ofNode & node(*this->parent->getNode());
+		ofNode & node(this->parent->getNode());
 		
 		if (this->axis == NO_AXIS) {
 			string reading;

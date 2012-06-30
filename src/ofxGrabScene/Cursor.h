@@ -35,6 +35,7 @@ namespace GrabScene {
 		ofVec3f startWorld;
 		Cursor lastFrame;
 		int lastUpdate;
+		bool dragged;
 		
 		ofVec3f worldViewFrameDifference;
 		

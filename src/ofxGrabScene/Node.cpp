@@ -6,20 +6,22 @@
 
 namespace GrabScene {
 	//----------
-	Handles Node::handles = Handles();
-	
-	//----------
-	Node::Node(ofNode & node) {
+	WrappedNode::WrappedNode(ofNode & node) {
 		this->node = &node;
 	}
 	
 	//----------
-	void Node::draw() {
+	void WrappedNode::draw() {
 		this->node->draw();
 	}
 	
 	//----------
-	ofNode * Node::getNode() const {
-		return this->node;
+	void WrappedNode::drawStencil() {
+		this->node->draw();
+	}
+	
+	//----------
+	ofNode & WrappedNode::getNode() {
+		return *this->node;
 	}
 }

@@ -5,20 +5,38 @@
 #pragma once
 
 #include "ofNode.h"
-#include "Handles.h"
+#include "Assets.h"
 
 namespace GrabScene {
-	class Handles;
-	
-	class Node {
+	class BaseNode {
 	public:
-		Node(ofNode & node);
+		virtual void draw() = 0;
+		virtual void drawStencil() = 0;
+		virtual ofNode & getNode() = 0;
+	};
+	
+	class Node : public ofNode {
+	public:
+		ofNode & getNode() { return *this; }
+	};
+	
+	class WrappedNode : public BaseNode {
+	public:
+		WrappedNode(ofNode &);
 		void draw();
-		ofNode * getNode() const;
+		void drawStencil();
 		
-		friend class Scene;		
+		ofNode & getNode();		
 	protected:
 		ofNode * node;
-		static Handles handles;
+	};
+	
+	class NullNode : public BaseNode {
+	public:
+		void draw() { };
+		void drawStencil() { };
+		ofNode & getNode() { return node; };
+	protected:
+		ofNode node;
 	};
 }

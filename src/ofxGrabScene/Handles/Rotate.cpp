@@ -79,21 +79,29 @@ namespace GrabScene {
 	
 	//---------
 	void Handles::Rotate::draw() const {
-		if (parent == 0)
+		if (parent == 0 || !this->enabled)
 			return;
 		
-		parent->getNode()->transformGL();
+		GLboolean hadLighting;
+		glGetBooleanv(GL_LIGHTING, &hadLighting);
+		if (hadLighting)
+			ofDisableLighting();
+		
+		parent->getNode().transformGL();
 		ofPushMatrix();
 		ofScale(scale, scale, scale);
 		
 		ofPushStyle();
+		shader("fixed").begin();
 		
 		this->rotateAxis();
 		this->setStyleFill();
 		fill.draw();
 		this->setStyleLine();
 		line.draw();
-
+		
+		shader("fixed").end();
+		
 		ofSetColor(255);
 		if (this->rollover) {
 			ofTranslate(0, GRABSCENE_HANDLES_RADIUS_1 + GRABSCENE_HANDLES_RADIUS_2 * 2);
@@ -104,15 +112,18 @@ namespace GrabScene {
 		ofPopStyle();
 		
 		ofPopMatrix();
-		parent->getNode()->restoreTransformGL();
+		parent->getNode().restoreTransformGL();
+		
+		if (hadLighting)
+			ofEnableLighting();
 	}
 	
 	//---------
 	void Handles::Rotate::drawStencil() const {
-		if (parent == 0)
+		if (parent == 0 || !this->enabled)
 			return;
 		
-		parent->getNode()->transformGL();
+		parent->getNode().transformGL();
 		ofPushMatrix();
 		ofScale(scale, scale, scale);
 		
@@ -120,7 +131,7 @@ namespace GrabScene {
 		fill.draw();
 		
 		ofPopMatrix();
-		parent->getNode()->restoreTransformGL();
+		parent->getNode().restoreTransformGL();
 	}
 	
 	//---------
@@ -128,7 +139,7 @@ namespace GrabScene {
 		if (this->parent == 0)
 			return;
 		
-		ofNode & node(*this->parent->getNode());
+		ofNode & node(this->parent->getNode());
 		ofVec3f center = node.getPosition();
 		ofVec3f direction = this->getDirection() * node.getOrientationQuat();
 		
@@ -156,7 +167,7 @@ namespace GrabScene {
 		if (this->parent == 0)
 			return "";
 		
-		ofNode & node(*this->parent->getNode());
+		ofNode & node(this->parent->getNode());
 		
 		return ofToString(node.getOrientationEuler().dot(this->getDirection()), 2);
 	}

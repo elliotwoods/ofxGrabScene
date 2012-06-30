@@ -11,18 +11,20 @@ namespace GrabScene {
 		this->indexCachedFrame = -1;
 		this->index = 0;
 		this->lockIndex = false;
-		this->selection = 0;
+		this->selectedNode = 0;
+		
 		this->elements.push_back(new NullElement());
+		this->nodes.push_back(new NullNode());
+		
 		indexBuffer.allocate(512, 512, GL_RGB32F);
 
-		Node::handles.init();
-		this->add(Node::handles.translateX);
-		this->add(Node::handles.translateY);
-		this->add(Node::handles.translateZ);
-		this->add(Node::handles.translateC);
-		this->add(Node::handles.rotateX);
-		this->add(Node::handles.rotateY);
-		this->add(Node::handles.rotateZ);
+		this->add(handles.translateX);
+		this->add(handles.translateY);
+		this->add(handles.translateZ);
+		this->add(handles.translateC);
+		this->add(handles.rotateX);
+		this->add(handles.rotateY);
+		this->add(handles.rotateZ);
 	}
 	
 	//----------
@@ -34,8 +36,13 @@ namespace GrabScene {
 		ofAddListener(ofEvents().mouseDragged, this, &Scene::mouseDragged);
 		ofAddListener(ofEvents().keyPressed, this, &Scene::keyPressed);
 		ofAddListener(ofEvents().keyReleased, this, &Scene::keyReleased);
+		ofAddListener(AssetRegister.evtLoad, this, &Scene::assetsLoad);
 		
 		this->camera = &camera;
+		
+		AssetRegister.init();
+		handles.init();
+		
 	}
 	
 	//----------
@@ -45,45 +52,42 @@ namespace GrabScene {
 		ofEnableAlphaBlending();
 		
 		////
-		//standard
+		//nodes
 		node_iterator itN;
 		for (itN = this->nodes.begin(); itN != this->nodes.end(); itN++) {
-			(*itN)->node->draw();
-		}
-		
-		const_element_iterator it;
-		for (it = elements.begin(); it != elements.end(); it++) {
-			if (!(**it).onTop())
-				(**it).draw();
+			(*itN)->draw();
 		}
 		//
 		////
 		
 		
-		////
-		//onTop
-		GLboolean hadLighting;
-		glGetBooleanv(GL_LIGHTING, &hadLighting);
-		if (hadLighting)
-			ofDisableLighting();
+		////		
+		//elements
 		
+		//not onTop
+		const_element_iterator it;
+		for (it = elements.begin(); it != elements.end(); it++) {
+			if (!(**it).onTop())
+				(**it).draw();
+		}
+		
+		//onTop
 		if (frameBuffer.getWidth() != ofGetWidth() || frameBuffer.getHeight() != ofGetHeight()) {
 			frameBuffer.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA, 4);
 		}
 		frameBuffer.bind();
-		
 		glClearColor(0, 0, 0, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		for (it = elements.begin(); it != elements.end(); it++) {
 			if ((**it).onTop())
 				(**it).draw();
 		}
-		
 		frameBuffer.unbind();
-		drawFrameBuffer(frameBuffer);
-		
-		if (hadLighting)
-			ofEnableLighting();
+		glColor4f(1.0f, 1.0f, 1.0f, 0.8f);
+		shader("constant").begin();
+		shader("constant").setUniformTexture("tex", frameBuffer, 0);
+		drawFullscreen(frameBuffer);
+		shader("constant").end();
 		//
 		////
 		
@@ -94,12 +98,29 @@ namespace GrabScene {
 			nodeIndexBuffer.allocate(ofGetWidth(), ofGetHeight(), GL_RGB32F);
 		}
 		nodeIndexBuffer.bind();
+		ofClear(0,0,0,0);
+		shader("index").begin();
 		int index = 0;
 		for (itN = this->nodes.begin(); itN != this->nodes.end(); itN++) {
-			glColor4f(float(index) / float(1 << 10), 0, 0, 1);
+			shader("index").setUniform1i("index", index);
+			(*itN)->drawStencil();
 			index++;
 		}
+		shader("index").end();
+		
+		GLfloat reading[3];
+		glReadPixels(ofGetMouseX(), ofGetHeight() - 1 - ofGetMouseY(), 1, 1, GL_RGB, GL_FLOAT, &reading);
+		this->nodeUnderCursor =  reading[0] * GRABSCENE_INDEX_VALUE_SCALE;
+		
 		nodeIndexBuffer.unbind();
+		
+		ofShader & outlineShader(shader("outlineIndex"));
+		outlineShader.begin();
+		outlineShader.setUniform1i("selection", this->selectedNode);
+		outlineShader.setUniform1f("valueOffset", 1 << 10);
+		outlineShader.setUniformTexture("texIndex", nodeIndexBuffer, 2);
+		drawFullscreen(nodeIndexBuffer);
+		outlineShader.end();
 		//
 		////
 		
@@ -119,39 +140,62 @@ namespace GrabScene {
 	
 	//----------
 	void Scene::add(ofNode & node) {
-		this->nodes.push_back(new Node(node));
-		this->setSelectedNode(*nodes.back());
+		BaseNode * newNode = new WrappedNode(node);
+		this->nodes.push_back(newNode);
+		this->setSelectedNode(this->nodes.size() - 1);
 	}
 
 	//----------
-	bool Scene::hasValidSelection() const {
-		if (this->selection == 0)
-			return false;
-		if (this->selection->getNode() == 0)
-			return false;
-		return true;
-	}
-	//----------
-	Node * const Scene::getSelectedNode() const {
-		return this->selection;
+	bool Scene::hasSelection() const {
+		return (this->selectedNode != 0);
 	}
 	
 	//----------
-	void Scene::setSelectedNode(Node & node) {
-		this->selection = &node;
-		Handles::BaseHandle::setParent(&node);
-		return this->selection;
-	}
-	
-	
-	//----------
-	Element * const Scene::getElementUnderCursor() {
-		if (this->index < this->elements.size()) {
-			return this->elements[this->index];
-		} else {
-			ofLogError("ofxGrabScene") << "Found index " << this->index << " is out of range for this scene, which has " << this->elements.size() << " registered elements.";
-			return this->elements[0]; //null element
+	BaseNode & Scene::getSelectedNode() {
+		if (this->selectedNode >= this->nodes.size()) {
+			ofLogWarning("GrabScene") << "Selected node index is outside bounds of available nodes, selecting null node";
+			this->selectedNode = 0;
 		}
+		return *this->nodes[this->selectedNode];
+	}
+	
+	//----------
+	void Scene::setSelectedNode(BaseNode & node) {
+		const_node_iterator it;
+		int index = 0;
+		for (it = this->nodes.begin(); it != this->nodes.end(); it++) {
+			if ((*it) == &node) {
+				this->setSelectedNode(index);
+				return;
+			}
+			index++;
+		}
+		
+		ofLogError("GrabScene") << "node not found when calling setSelectedNode";
+	}
+	
+	//----------
+	void Scene::setSelectedNode(const unsigned int index) {
+		if (index >= this->nodes.size()) {
+			ofLogError("GrabScene") << "Node index " << index << " is outside the range of available nodes, selecting null node";
+		} else {
+			this->selectedNode = index;
+			Handles::BaseHandle::setParent(this->nodes[index]);
+			if (this->selectedNode == 0)
+				Handles::BaseHandle::disable();
+			else
+				Handles::BaseHandle::enable();
+		}
+	}
+	
+	//----------
+	Element & Scene::getElementUnderCursor() {
+		if (this->index >= this->elements.size()) {
+			ofLogError("ofxGrabScene") << "Found index " << this->index << " is out of range for this scene, which has " << this->elements.size() << " registered elements. Selecting null element.";
+			this->index = 0;
+		}
+			
+		return *this->elements[this->index];
 	}
 	
 	//----------
@@ -165,8 +209,8 @@ namespace GrabScene {
 	}
 	
 	//----------
-	void Scene::drawFrameBuffer(ofFbo & fbo) {
-		glDisable(GL_DEPTH_FUNC);
+	void Scene::drawFullscreen(ofBaseHasTexture & tex) {
+		glDisable(GL_DEPTH_TEST);
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 		glLoadIdentity();
@@ -174,14 +218,37 @@ namespace GrabScene {
 		glPushMatrix();
 		glLoadIdentity();
 		
-		glTranslatef(0, 0, -0.99f);
-		glColor4f(1.0f, 1.0f, 1.0f, 0.8f);
-		fbo.draw(-1, -1, 2, 2);
+		//tex.getTextureReference().bind();
+		
+		const float width = tex.getTextureReference().getWidth();
+		const float height = tex.getTextureReference().getHeight();
+		
+		ofMesh quad;
+		quad.addVertex(ofVec3f(-1,-1,0));
+		quad.addTexCoord(ofVec2f(0,0));
+		quad.addVertex(ofVec3f(+1,-1,0));
+		quad.addTexCoord(ofVec2f(width,0));
+		quad.addVertex(ofVec3f(-1,+1,0));
+		quad.addTexCoord(ofVec2f(0,height));
+		quad.addVertex(ofVec3f(+1,+1,0));
+		quad.addTexCoord(ofVec2f(width,height));
+		
+		quad.addIndex(0);
+		quad.addIndex(1);
+		quad.addIndex(3);
+		
+		quad.addIndex(0);
+		quad.addIndex(3);
+		quad.addIndex(2);
+	
+		quad.drawFaces();
+		
+		//tex.getTextureReference().unbind();
 		
 		glPopMatrix();
 		glMatrixMode(GL_MODELVIEW);
 		glPopMatrix();
-		glEnable(GL_DEPTH_FUNC);
+		glEnable(GL_DEPTH_TEST);
 	}
 	
 	//----------
@@ -212,24 +279,27 @@ namespace GrabScene {
 		ofDisableSmoothing();
 		ofDisableAlphaBlending();
 		
-		float scaledValue;
+		ofShader & indexShader(AssetRegister.getShader("index"));
+		indexShader.begin();
+		indexShader.setUniform1f("valueOffset", GRABSCENE_INDEX_VALUE_SCALE);
+		
 		//standard
+		int index = 0;
 		for (int i=0; i<elements.size(); i++) {
 			if (elements[i]->onTop())
 				continue;
-			scaledValue = float(i) / float(1 << 10);
-			glColor3f(scaledValue, scaledValue, scaledValue);
+			indexShader.setUniform1i("index", index++);
 			elements[i]->drawStencil();
 		}
 		//onTop
 		for (int i=0; i<elements.size(); i++) {
 			if (!elements[i]->onTop())
 				continue;
-			scaledValue = float(i) / float(1 << 10);
-			glColor3f(scaledValue, scaledValue, scaledValue);
+			indexShader.setUniform1i("index", index++);
 			elements[i]->drawStencil();
 		}
 		
+		indexShader.end();
 		ofPopStyle();
 		
 		ofPopMatrix();
@@ -238,21 +308,16 @@ namespace GrabScene {
 		glDisable(GL_DEPTH_TEST);
 		
 		if (!this->lockIndex) {
-			float rawValue;
-			glReadPixels(0, 0, 1, 1, GL_RED, GL_FLOAT, &rawValue);
-			unsigned short readIndex = rawValue * float(1 << 10) + 0.5f;
+			float rawValue[3];
+			glReadPixels(0, 0, 1, 1, GL_RGB, GL_FLOAT, &rawValue);
+			unsigned short readIndex = rawValue[0] * float(GRABSCENE_INDEX_VALUE_SCALE) + 0.5f;
 			indexCachedFrame = ofGetFrameNum();
 			
 			//perform cursor over, cursor out actions
 			if (this->index != readIndex) {
-				if (this->index != 0)
-					this->getElementUnderCursor()->cursorOut(cursor);
-				
+				this->getElementUnderCursor().cursorOut(cursor);
 				this->index = readIndex;
-				cout << "Found index " << this->index << endl;
-				
-				if (this->index != 0)
-					this->getElementUnderCursor()->cursorOver(cursor);
+				this->getElementUnderCursor().cursorOver(cursor);
 			}
 		}
 		indexBuffer.end();
@@ -324,8 +389,8 @@ namespace GrabScene {
 	void Scene::update(ofEventArgs & args) {
 		this->updateCursorAndIndex();
 		
-		if (this->hasValidSelection()) {
-			float distanceToNode = (this->camera->getPosition() - this->selection->getNode()->getPosition()).length();
+		if (this->hasSelection()) {
+			float distanceToNode = (this->camera->getPosition() - this->getSelectedNode().getNode().getPosition()).length();
 			float planeHeight = tan(camera->getFov() * DEG_TO_RAD / 2.0f) * 2.0f * distanceToNode;
 			Handles::BaseHandle::setScale(planeHeight / 8.0f);
 		}
@@ -338,8 +403,8 @@ namespace GrabScene {
 		this->getElementUnderCursor();
 		
 		//help ofxGrabCam by using our version of the world cursor
-		if (this->cursor.world != ofVec3f(0,0,0))
-			this->camera->setCursorWorld(this->cursor.world);
+//		if (this->cursor.world != ofVec3f(0,0,0))
+//			this->camera->setCursorWorld(this->cursor.world);
 	}
 	
 	//----------
@@ -347,8 +412,9 @@ namespace GrabScene {
 		this->updateCursorAndIndex();
 		this->cursor.start(args.button);
 		this->cursor.captured = args.button == 0 && !ofGetKeyPressed();
+		this->cursor.dragged = false;
 		
-		this->getElementUnderCursor()->cursorDown(cursor);
+		this->getElementUnderCursor().cursorDown(cursor);
 		
 		if (cursor.captured) {
 			this->camera->setMouseActions(false);
@@ -360,17 +426,23 @@ namespace GrabScene {
 	void Scene::mouseReleased(ofMouseEventArgs & args) {
 		this->updateCursorAndIndex();
 		this->cursor.end(args.button);
-		this->getElementUnderCursor()->cursorReleased(this->cursor);
+		this->getElementUnderCursor().cursorReleased(this->cursor);
 		this->camera->setMouseActions(true);
 		this->lockIndex = false;
+		
+		//click
+		if (!this->cursor.dragged) {
+			this->setSelectedNode(nodeUnderCursor);
+		}
 	}
 	
 	//----------
 	void Scene::mouseDragged(ofMouseEventArgs & args) {
 		if (this->cursor.captured) {
 			this->updateCursorAndIndex();
-			this->getElementUnderCursor()->cursorDragged(this->cursor);
+			this->getElementUnderCursor().cursorDragged(this->cursor);
 		}
+		this->cursor.dragged = true;
 	}
 	
 	
@@ -381,6 +453,11 @@ namespace GrabScene {
 	
 	//----------
 	void Scene::keyReleased(ofKeyEventArgs & args) {
+		
+	}
+	
+	//----------
+	void Scene::assetsLoad(GrabScene::Assets &assets) {
 		
 	}
 }

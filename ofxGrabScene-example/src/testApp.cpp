@@ -6,7 +6,8 @@ void testApp::setup(){
 	ofSetVerticalSync(true);
 	
 	scene.init(camera);
-	scene.add(node);
+	scene.add(node1);
+	scene.add(node2);
 	
 	camera.setPosition(2.0f, 2.0f, 2.0f);
 	camera.lookAt(ofVec3f(0.0f, 0.0f, 0.0f));
@@ -22,6 +23,7 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
+	
 	ofBackground(40);
 	camera.begin();
 	light.enable();
@@ -40,4 +42,6 @@ void testApp::draw(){
 void testApp::keyPressed(int key){
 	if (key == 'c')
 		camera.toggleCursorDraw();
+	if (key == ' ')
+		GrabScene::AssetRegister.refresh();
 }

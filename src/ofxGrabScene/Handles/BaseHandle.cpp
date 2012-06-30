@@ -6,8 +6,9 @@
 
 namespace GrabScene {
 	//---------
-	Node * Handles::BaseHandle::parent = 0;
+	BaseNode * Handles::BaseHandle::parent = 0;
 	float Handles::BaseHandle::scale = 1.0f;
+	bool Handles::BaseHandle::enabled = true;
 	
 	//---------
 	Handles::BaseHandle::BaseHandle(Axis axis) {
@@ -17,28 +18,28 @@ namespace GrabScene {
 		switch (this->axis) {
 			case X_AXIS:
 				this->fillColor.setHsb(0, GRABSCENE_HANDLES_SATURATION, GRABSCENE_HANDLES_FILL_BRIGHTNESS);
-				this->lineColor.setHsb(0, 0, GRABSCENE_HANDLES_LINE_BRIGHTNESS);
+				this->lineColor.setHsb(0, 0, GRABSCENE_HANDLES_LINE_BRIGHTNESS, 0);
 				break;
 				
 			case Y_AXIS:
 				this->fillColor.setHsb(255/3, GRABSCENE_HANDLES_SATURATION, GRABSCENE_HANDLES_FILL_BRIGHTNESS);
-				this->lineColor.setHsb(255/3, 0, GRABSCENE_HANDLES_LINE_BRIGHTNESS);
+				this->lineColor.setHsb(255/3, 0, GRABSCENE_HANDLES_LINE_BRIGHTNESS, 0);
 				break;
 				
 			case Z_AXIS:
 				this->fillColor.setHsb(255/3*2, GRABSCENE_HANDLES_SATURATION, GRABSCENE_HANDLES_FILL_BRIGHTNESS);
-				this->lineColor.setHsb(255/3*2, 0, GRABSCENE_HANDLES_LINE_BRIGHTNESS);
+				this->lineColor.setHsb(255/3*2, 0, GRABSCENE_HANDLES_LINE_BRIGHTNESS, 0);
 				break;
 				
 			case NO_AXIS:
 				this->fillColor = ofColor(200,200,200);
-				this->lineColor = ofColor(GRABSCENE_HANDLES_LINE_BRIGHTNESS,GRABSCENE_HANDLES_LINE_BRIGHTNESS,GRABSCENE_HANDLES_LINE_BRIGHTNESS);
+				this->lineColor = ofColor(GRABSCENE_HANDLES_LINE_BRIGHTNESS,GRABSCENE_HANDLES_LINE_BRIGHTNESS,GRABSCENE_HANDLES_LINE_BRIGHTNESS, 0);
 				break;
 		}
 	}
 	
 	//---------
-	void Handles::BaseHandle::setParent(Node * node) {
+	void Handles::BaseHandle::setParent(BaseNode * node) {
 		parent = node;
 	}
 	
@@ -106,5 +107,15 @@ namespace GrabScene {
 	//---------
 	void Handles::BaseHandle::setScale(float scale) {
 		Handles::BaseHandle::scale = scale;
+	}
+	
+	//---------
+	void Handles::BaseHandle::enable() {
+		Handles::BaseHandle::enabled = true;
+	}
+	
+	//---------
+	void Handles::BaseHandle::disable() {
+		Handles::BaseHandle::enabled = false;
 	}
 }
