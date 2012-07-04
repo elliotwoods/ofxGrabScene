@@ -2,7 +2,7 @@
 //  BaseHandle.cpp
 //  ofxGrabScene
 //
-#include "Handles.h"
+#include "../Handles.h"
 
 namespace GrabScene {
 	//---------
@@ -48,16 +48,14 @@ namespace GrabScene {
 		switch(axis) {
 			case X_AXIS:
 				return ofVec3f(1, 0, 0);
-				break;
 			case Y_AXIS:
 				return ofVec3f(0, 1, 0);
-				break;
 			case Z_AXIS:
 				return ofVec3f(0, 0, 1);
-				break;
 			case NO_AXIS:
 				return ofVec3f(1, 1, 1);
-				break;
+			default:
+				return ofVec3f();
 		}
 	}
 	
