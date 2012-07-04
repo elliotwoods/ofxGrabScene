@@ -11,3 +11,9 @@ bin/
 build/
 !data/
 xcuserdata/
+
+ipch/
+*.sdf
+*.opensdf
+*.suo
+*.vcxproj.user
