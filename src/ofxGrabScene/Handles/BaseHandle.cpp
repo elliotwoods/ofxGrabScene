@@ -40,8 +40,8 @@ namespace GrabScene {
 	}
 	
 	//---------
-	void Handles::BaseHandle::setParent(BaseNode * node) {
-		Handles::BaseHandle::parent = node;
+	void Handles::BaseHandle::setParent(BaseNode & node) {
+		Handles::BaseHandle::parent = &node;
 	}
 	
 	//---------

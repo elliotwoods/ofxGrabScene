@@ -25,7 +25,7 @@ namespace GrabScene {
 		public:
 			BaseHandle(Axis);
 			ofVec3f getDirection() const;
-			static void setParent(BaseNode * node);
+			static void setParent(BaseNode & node);
 			static void setCamera(ofCamera &);
 			void cursorOver(const Cursor &);
 			void cursorOut(const Cursor &);

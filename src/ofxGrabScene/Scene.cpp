@@ -8,17 +8,14 @@
 namespace GrabScene {
 	//----------
 	Scene::Scene() {
-		this->indexCachedFrame = -1;
-		this->index = 0;
-		this->lockIndex = false;
-		this->selectedNode = 0;
+		this->elementUnderCursor = 0;
+		this->nodeUnderCursor = false;
+		this->nodeSelected = 0;
 		this->initialised = false;
 		
 		this->elements.push_back(new NullElement());
 		this->nodes.push_back(new NullNode());
 		
-		indexBuffer.allocate(512, 512, GL_RGBA32F);
-
 		this->add(handles.translateX);
 		this->add(handles.translateY);
 		this->add(handles.translateZ);
@@ -68,24 +65,21 @@ namespace GrabScene {
 		
 		////		
 		//elements
-		
-		//not onTop
-		const_element_iterator it;
-		for (it = elements.begin(); it != elements.end(); it++) {
-			if (!(**it).onTop())
-				(**it).draw();
+		const_element_iterator itE;
+		for (itE = elements.begin(); itE != elements.end(); itE++) {
+			if (!(**itE).onTop())
+				(**itE).draw();
 		}
-		
 		//onTop
 		if (frameBuffer.getWidth() != ofGetWidth() || frameBuffer.getHeight() != ofGetHeight()) {
 			frameBuffer.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA, 4);
 		}
+		//
 		frameBuffer.bind();
-		glClearColor(0, 0, 0, 0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		for (it = elements.begin(); it != elements.end(); it++) {
-			if ((**it).onTop())
-				(**it).draw();
+		ofClear(0,0,0,0);
+		for (itE = elements.begin(); itE != elements.end(); itE++) {
+			if ((**itE).onTop())
+				(**itE).draw();
 		}
 		frameBuffer.unbind();
 		glColor4f(1.0f, 1.0f, 1.0f, 0.8f);
@@ -97,48 +91,110 @@ namespace GrabScene {
 		////
 		
 		
-		////
-		//nodeindexbuffer
-		if (nodeIndexBuffer.getWidth() != ofGetWidth() || nodeIndexBuffer.getHeight() != ofGetHeight()) {
-			nodeIndexBuffer.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA32F);
+		/////////////
+		//indexBuffer
+		/////////////
+		//
+		if (indexBuffer.getWidth() != ofGetWidth() || indexBuffer.getHeight() != ofGetHeight()) {
+			indexBuffer.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA32F);
 		}
-		nodeIndexBuffer.bind();
-		ofClear(0,0,0,0);
+
+		indexBuffer.bind();
 		shader("index").begin();
+		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+		//draws an index at each pixel for elements and nodes underneath
+		//first elements, then nodes
 		int index = 0;
+		
+		for (itE = this->elements.begin(); itE != this->elements.end(); itE++) {
+			if (!(*itE)->onTop()) {
+				shader("index").setUniform1i("index", index);
+				(*itE)->drawStencil();
+			}
+			index++;
+		}
+
 		for (itN = this->nodes.begin(); itN != this->nodes.end(); itN++) {
 			shader("index").setUniform1i("index", index);
 			(*itN)->drawStencil();
 			index++;
 		}
-		shader("index").end();
-		
-		GLfloat reading[4];
+
+		ofVec4f reading;
+		glReadPixels(ofGetMouseX(), ofGetHeight() - 1 - ofGetMouseY(), 1, 1, GL_RGBA, GL_FLOAT, &reading.x);
+		const uint16_t reading1 = reading.x;
+
+		//now redraw but with onTop elements
+		glClear(GL_DEPTH_BUFFER_BIT);
+		index = 0;
+
+		for (itE = this->elements.begin(); itE != this->elements.end(); itE++) {
+			if ((*itE)->onTop()) {
+				shader("index").setUniform1i("index", index);
+				(*itE)->drawStencil();
+			}
+			index++;
+		}
+
 		glReadPixels(ofGetMouseX(), ofGetHeight() - 1 - ofGetMouseY(), 1, 1, GL_RGBA, GL_FLOAT, &reading);
-		this->nodeUnderCursor =  reading[0] * GRABSCENE_INDEX_VALUE_SCALE;
-		if (this->index != 0)
+		const uint16_t reading2 = reading.x;
+
+		uint16_t returnedIndex = reading2 != 0 ? reading2 : reading1;
+
+		this->indexBuffer.unbind();
+		shader("index").end();
+
+		//clear cut cases:
+		if (returnedIndex == 0) {
+			//we're not over anything
+			if (!lockElementIndex)
+				this->elementUnderCursor = 0;
 			this->nodeUnderCursor = 0;
-		
-		nodeIndexBuffer.unbind();
-		
+		} else if (returnedIndex < this->elements.size()) {
+			//we're over an element
+			if (!lockElementIndex)
+				this->elementUnderCursor = returnedIndex;
+			this->nodeUnderCursor = 0;
+		} else if (returnedIndex - this->elements.size() < this->nodes.size()) {
+			//we're over a node
+			if (!lockElementIndex)
+				this->elementUnderCursor = 0;
+			this->nodeUnderCursor = returnedIndex - this->elements.size();
+		} else {
+			//we're fucked
+			ofLogError("GrabScene") << "Error when checking what's under the cursor";
+		}
+		//
+		////
+
+
+		////
+		//draw outlines
 		ofShader & outlineShader(shader("outlineIndex"));
 		outlineShader.begin();
-		outlineShader.setUniform1i("selection", this->selectedNode);
-		outlineShader.setUniform1i("hover", this->nodeUnderCursor);
-		outlineShader.setUniform1f("valueOffset", 1 << 10);
-		outlineShader.setUniformTexture("texIndex", nodeIndexBuffer, 2);
-		drawFullscreen(nodeIndexBuffer);
+		outlineShader.setUniform1i("elementHover", this->elementUnderCursor);
+		outlineShader.setUniform1i("nodeSelection", this->nodeSelected);
+		outlineShader.setUniform1i("nodeHover", this->nodeUnderCursor);
+		outlineShader.setUniformTexture("texIndex", indexBuffer, 2);
+		outlineShader.setUniform1i("elementCount", this->elements.size());
+		drawFullscreen(indexBuffer);
 		outlineShader.end();
 		//
 		////
 		
 		ofPopStyle();
 		
+
+		////
+		//cache values for unprojection of mouse
 		this->viewport = ofGetCurrentViewport();
 		glGetFloatv(GL_MODELVIEW_MATRIX, viewMatrix.getPtr());
 		glGetFloatv(GL_PROJECTION_MATRIX, projectionMatrix.getPtr());
 		glGetDoublev(GL_MODELVIEW_MATRIX, viewDoubles);
 		glGetDoublev(GL_PROJECTION_MATRIX, projectionDoubles);
+		//
+		////
 	}
 	
 	//----------
@@ -159,16 +215,16 @@ namespace GrabScene {
 
 	//----------
 	bool Scene::hasSelection() const {
-		return (this->selectedNode != 0);
+		return (this->nodeSelected > 0 && this->nodeSelected < this->nodes.size());
 	}
 	
 	//----------
 	BaseNode & Scene::getSelectedNode() {
-		if (this->selectedNode >= this->nodes.size()) {
+		if (this->nodeSelected >= this->nodes.size()) {
 			ofLogWarning("GrabScene") << "Selected node index is outside bounds of available nodes, selecting null node";
-			this->selectedNode = 0;
+			this->nodeSelected = 0;
 		}
-		return *this->nodes[this->selectedNode];
+		return *this->nodes[this->nodeSelected];
 	}
 	
 	//----------
@@ -187,28 +243,27 @@ namespace GrabScene {
 	}
 	
 	//----------
-	void Scene::setSelectedNode(const unsigned int index) {
+	void Scene::setSelectedNode(const uint16_t index) {
 		if (index >= this->nodes.size()) {
 			ofLogError("GrabScene") << "Node index " << index << " is outside the range of available nodes, selecting null node";
 		} else {
-			this->selectedNode = index;
-			Handles::BaseHandle::setParent(this->nodes[index]);
-			if (this->selectedNode == 0)
+			this->nodeSelected = index;
+			Handles::BaseHandle::setParent(this->getSelectedNode());
+			if (index == 0)
 				Handles::BaseHandle::disable();
 			else
 				Handles::BaseHandle::enable();
-			ofNotifyEvent(selectionChanged, this->selectedNode, this);
+			ofNotifyEvent(selectionChanged, this->nodeSelected, this);
 		}
 	}
 	
 	//----------
 	Element & Scene::getElementUnderCursor() {
-		if (this->index >= this->elements.size()) {
-			ofLogError("ofxGrabScene") << "Found index " << this->index << " is out of range for this scene, which has " << this->elements.size() << " registered elements. Selecting null element.";
-			this->index = 0;
-		}
-			
-		return *this->elements[this->index];
+		if (this->elementUnderCursor >= this->elements.size()) {
+			ofLogError("ofxGrabScene") << "Found index " << this->elementUnderCursor << " is out of range for this scene, which has " << this->elements.size() << " registered elements. Selecting null element.";
+			this->elementUnderCursor = 0;
+		}	
+		return *this->elements[this->elementUnderCursor];
 	}
 	
 	//----------
@@ -265,82 +320,8 @@ namespace GrabScene {
 	}
 	
 	//----------
-	void Scene::updateCursorAndIndex() {
-		if (indexCachedFrame >= ofGetFrameNum())
-			return;
-		
-		indexBuffer.begin();
-		glEnable(GL_DEPTH_TEST);
-		ofClear(0.0f);
-		
-		ofPushMatrix();
-		//
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		ofScale(+1.0f, -1.0f);
-		ofVec2f centerCursor;
-		centerCursor.x = (ofGetMouseX() - this->viewport.x) / (this->viewport.width / 2.0f);
-		centerCursor.y = (-ofGetMouseY() - this->viewport.y) / (this->viewport.height / 2.0f);
-		ofTranslate(-centerCursor.x, -centerCursor.y);
-		glMultMatrixf(projectionMatrix.getPtr());
-		//
-		glMatrixMode(GL_MODELVIEW);
-		glLoadMatrixf(viewMatrix.getPtr());
-		
-		ofPushStyle();
-		ofBackground(0);
-		ofDisableSmoothing();
-		ofDisableAlphaBlending();
-		
-		ofShader & indexShader(AssetRegister.getShader("index"));
-		indexShader.begin();
-		indexShader.setUniform1f("valueOffset", GRABSCENE_INDEX_VALUE_SCALE);
-		
-		//standard
-		int index = 0;
-		for (int i=0; i<elements.size(); i++) {
-			if (elements[i]->onTop())
-				continue;
-			indexShader.setUniform1i("index", index++);
-			elements[i]->drawStencil();
-		}
-		//onTop
-		for (int i=0; i<elements.size(); i++) {
-			if (!elements[i]->onTop())
-				continue;
-			indexShader.setUniform1i("index", index++);
-			elements[i]->drawStencil();
-		}
-		
-		indexShader.end();
-		ofPopStyle();
-		
-		ofPopMatrix();
-		
-		updateCursor();
-		glDisable(GL_DEPTH_TEST);
-		
-		if (!this->lockIndex) {
-			float rawValue[4];
-			glReadPixels(0, 0, 1, 1, GL_RGBA, GL_FLOAT, &rawValue);
-			unsigned short readIndex = rawValue[0] * float(GRABSCENE_INDEX_VALUE_SCALE) + 0.5f;
-			indexCachedFrame = ofGetFrameNum();
-			
-			//perform cursor over, cursor out actions
-			if (this->index != readIndex) {
-				this->getElementUnderCursor().cursorOut(cursor);
-				this->index = readIndex;
-				this->getElementUnderCursor().cursorOver(cursor);
-			}
-		}
-		indexBuffer.end();
-	}
-	
-	//----------
 	void Scene::updateCursor() {
-		
 		this->cursor.lastFrame = this->cursor;
-
 		
 		////
 		//screen
@@ -401,8 +382,6 @@ namespace GrabScene {
 	
 	//----------
 	void Scene::update(ofEventArgs & args) {
-		this->updateCursorAndIndex();
-		
 		if (this->hasSelection()) {
 			float distanceToNode = (this->camera->getPosition() - this->getSelectedNode().getNode().getPosition()).length();
 			float planeHeight = tan(camera->getFov() * DEG_TO_RAD / 2.0f) * 2.0f * distanceToNode;
@@ -413,7 +392,7 @@ namespace GrabScene {
 	
 	//----------
 	void Scene::mouseMoved(ofMouseEventArgs & args) {
-		this->updateCursorAndIndex();
+		this->updateCursor();
 		this->getElementUnderCursor();
 		
 		//help ofxGrabCam by using our version of the world cursor
@@ -423,7 +402,7 @@ namespace GrabScene {
 	
 	//----------
 	void Scene::mousePressed(ofMouseEventArgs & args) {
-		this->updateCursorAndIndex();
+		this->updateCursor();
 		this->cursor.start(args.button);
 		this->cursor.captured = args.button == 0 && !ofGetKeyPressed();
 		this->cursor.dragged = false;
@@ -433,19 +412,19 @@ namespace GrabScene {
 		if (cursor.captured) {
 			this->camera->setMouseActions(false);
 		}
-		this->lockIndex = true;
+		this->lockElementIndex = true;
 	}
 	
 	//----------
 	void Scene::mouseReleased(ofMouseEventArgs & args) {
-		this->updateCursorAndIndex();
+		this->updateCursor();
 		this->cursor.end(args.button);
 		this->getElementUnderCursor().cursorReleased(this->cursor);
 		this->camera->setMouseActions(true);
-		this->lockIndex = false;
+		this->lockElementIndex = false;
 		
 		//click
-		if (!this->cursor.dragged && this->index==0) {
+		if (!this->cursor.dragged && this->elementUnderCursor==0) {
 			this->setSelectedNode(nodeUnderCursor);
 		}
 	}
@@ -453,7 +432,7 @@ namespace GrabScene {
 	//----------
 	void Scene::mouseDragged(ofMouseEventArgs & args) {
 		if (this->cursor.captured) {
-			this->updateCursorAndIndex();
+			this->updateCursor();
 			this->getElementUnderCursor().cursorDragged(this->cursor);
 		}
 		this->cursor.dragged = true;

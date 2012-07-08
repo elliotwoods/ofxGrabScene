@@ -19,6 +19,7 @@ namespace GrabScene {
 		
 		virtual void cursorDragged(const MovingCursor &) { }
 		
+		/// Returns true when you want to draw this control Element on top of standard scene
 		virtual bool onTop() const { return false; }
 	};
 	

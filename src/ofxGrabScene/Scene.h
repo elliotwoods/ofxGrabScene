@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include "ofMain.h"
 #include "ofxGrabCam.h"
 
@@ -13,8 +15,6 @@
 #include "Cursor.h"
 #include "Assets.h"
 #include "Handles.h"
-
-#define GRABSCENE_INDEX_VALUE_SCALE (1 << 10)
 
 namespace GrabScene{
 	class Scene : public ofNode {
@@ -33,7 +33,7 @@ namespace GrabScene{
 		bool hasSelection() const;
 		BaseNode & getSelectedNode();
 		void setSelectedNode(BaseNode &);
-		void setSelectedNode(const unsigned int index);
+		void setSelectedNode(const uint16_t index);
 		
 		Element & getElementUnderCursor();
 		
@@ -79,18 +79,26 @@ namespace GrabScene{
 		//
 		void drawFullscreen(ofBaseHasTexture &);
 		ofFbo frameBuffer;
-		////
-		
-		
-		////
-		//element index buffer
 		//
+		////
+		
+
+		////
+		//index buffer
 		ofFbo indexBuffer;
-		bool lockIndex;
-		unsigned short index;
-		int indexCachedFrame;
-		void updateCursorAndIndex();
-		void updateCursorOnly();
+		// 0 = no selection for the below
+		uint16_t elementUnderCursor; 
+		uint16_t nodeUnderCursor; 
+		uint16_t nodeSelected;
+		//
+		bool lockElementIndex;
+		//
+		////
+
+		
+		////
+		//cursor
+		//
 		void updateCursor();
 		//
 		////
@@ -99,10 +107,7 @@ namespace GrabScene{
 		////
 		//node interaction
 		//
-		ofFbo nodeIndexBuffer;
 		Handles handles;
-		unsigned int selectedNode; //0 = no selection
-		unsigned int nodeUnderCursor;
 		//
 		////
 		
