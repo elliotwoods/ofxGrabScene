@@ -77,7 +77,7 @@ namespace GrabScene {
 			void cursorDragged(const MovingCursor &);
 			
 		protected:
-			ofMatrix4x4 doTransform() const;
+			void doTransform() const;
 			string getReading() const;
 			static ofMesh fill;
 			static ofMesh line;

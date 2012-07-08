@@ -163,7 +163,7 @@ namespace GrabScene {
 	}
 	
 	//---------
-	ofMatrix4x4 Handles::Rotate::doTransform() const {
+	void Handles::Rotate::doTransform() const {
 		ofTranslate(parent->getNode().getPosition());
 		glMultMatrixf(ofMatrix4x4(parent->getNode().getOrientationQuat()).getPtr());
 		ofScale(scale, scale, scale);

@@ -57,7 +57,7 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..\..\..\addons\ofxGrabScene\src;..\..\..\addons\ofxGrabCam\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\addons\ofxXmlSettings\libs;..\..\..\addons\ofxXmlSettings\src;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxGrabScene\src;..\..\..\addons\ofxGrabCam\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
@@ -97,6 +97,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\ofxGrabCam\src\ofxGrabCam.cpp" />
+    <ClCompile Include="..\..\ofxGui\src\ofxBaseGui.cpp" />
+    <ClCompile Include="..\..\ofxGui\src\ofxButton.cpp" />
+    <ClCompile Include="..\..\ofxGui\src\ofxLabel.cpp" />
+    <ClCompile Include="..\..\ofxGui\src\ofxPanel.cpp" />
+    <ClCompile Include="..\..\ofxGui\src\ofxSlider.cpp" />
+    <ClCompile Include="..\..\ofxGui\src\ofxToggle.cpp" />
+    <ClCompile Include="..\..\ofxXmlSettings\libs\tinyxml.cpp" />
+    <ClCompile Include="..\..\ofxXmlSettings\libs\tinyxmlerror.cpp" />
+    <ClCompile Include="..\..\ofxXmlSettings\libs\tinyxmlparser.cpp" />
+    <ClCompile Include="..\..\ofxXmlSettings\src\ofxXmlSettings.cpp" />
     <ClCompile Include="..\src\ofxGrabScene\Assets.cpp" />
     <ClCompile Include="..\src\ofxGrabScene\Cursor.cpp" />
     <ClCompile Include="..\src\ofxGrabScene\Handles.cpp" />
@@ -110,6 +120,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ofxGrabCam\src\ofxGrabCam.h" />
+    <ClInclude Include="..\..\ofxGui\src\ofOscParameter.h" />
+    <ClInclude Include="..\..\ofxGui\src\ofParameter.h" />
+    <ClInclude Include="..\..\ofxGui\src\ofxBaseGui.h" />
+    <ClInclude Include="..\..\ofxGui\src\ofxButton.h" />
+    <ClInclude Include="..\..\ofxGui\src\ofxGui.h" />
+    <ClInclude Include="..\..\ofxGui\src\ofxLabel.h" />
+    <ClInclude Include="..\..\ofxGui\src\ofxPanel.h" />
+    <ClInclude Include="..\..\ofxGui\src\ofxSlider.h" />
+    <ClInclude Include="..\..\ofxGui\src\ofxToggle.h" />
+    <ClInclude Include="..\..\ofxXmlSettings\libs\tinyxml.h" />
+    <ClInclude Include="..\..\ofxXmlSettings\src\ofxXmlSettings.h" />
     <ClInclude Include="..\src\ofxGrabScene.h" />
     <ClInclude Include="..\src\ofxGrabScene\Assets.h" />
     <ClInclude Include="..\src\ofxGrabScene\Cursor.h" />
