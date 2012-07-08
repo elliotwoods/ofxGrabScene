@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\testApp.cpp" />
+    <ClCompile Include="..\..\ofxGrabCam\src\ofxGrabCam.cpp">
+      <Filter>addons\ofxGrabCam\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxGrabScene\Assets.cpp">
+      <Filter>addons\ofxGrabScene\src\ofxGrabScene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxGrabScene\Cursor.cpp">
+      <Filter>addons\ofxGrabScene\src\ofxGrabScene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxGrabScene\Handles.cpp">
+      <Filter>addons\ofxGrabScene\src\ofxGrabScene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxGrabScene\Node.cpp">
+      <Filter>addons\ofxGrabScene\src\ofxGrabScene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxGrabScene\Scene.cpp">
+      <Filter>addons\ofxGrabScene\src\ofxGrabScene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxGrabScene\Handles\Rotate.cpp">
+      <Filter>addons\ofxGrabScene\src\ofxGrabScene\Handles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxGrabScene\Handles\Translate.cpp">
+      <Filter>addons\ofxGrabScene\src\ofxGrabScene\Handles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxGrabScene\Handles\BaseHandle.cpp">
+      <Filter>addons\ofxGrabScene\src\ofxGrabScene\Handles</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\testApp.h" />
+    <ClInclude Include="..\..\ofxGrabCam\src\ofxGrabCam.h">
+      <Filter>addons\ofxGrabCam\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxGrabScene.h">
+      <Filter>addons\ofxGrabScene\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxGrabScene\Assets.h">
+      <Filter>addons\ofxGrabScene\src\ofxGrabScene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxGrabScene\Cursor.h">
+      <Filter>addons\ofxGrabScene\src\ofxGrabScene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxGrabScene\Element.h">
+      <Filter>addons\ofxGrabScene\src\ofxGrabScene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxGrabScene\Handles.h">
+      <Filter>addons\ofxGrabScene\src\ofxGrabScene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxGrabScene\Node.h">
+      <Filter>addons\ofxGrabScene\src\ofxGrabScene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxGrabScene\Scene.h">
+      <Filter>addons\ofxGrabScene\src\ofxGrabScene</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="addons">
+      <UniqueIdentifier>{2dd210d9-f604-40e2-ade3-531d58fda47e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxGrabCam">
+      <UniqueIdentifier>{3d498924-3eae-49dd-8f90-9a2152454d7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxGrabCam\src">
+      <UniqueIdentifier>{5b05911a-b5a3-4bf1-8962-401c8bca47d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxGrabScene">
+      <UniqueIdentifier>{e534e4f7-8880-4d41-ac7a-2d5bebceacc3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxGrabScene\src">
+      <UniqueIdentifier>{71d187dd-6ff2-4cb1-8337-1ffc99e64b50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxGrabScene\src\ofxGrabScene">
+      <UniqueIdentifier>{8f2f519a-8746-4bd7-ac89-e399be8b59aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxGrabScene\src\ofxGrabScene\Handles">
+      <UniqueIdentifier>{f42c012f-1ae4-4d82-b94a-71c358a837bb}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
