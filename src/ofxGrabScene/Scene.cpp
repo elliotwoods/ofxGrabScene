@@ -12,11 +12,12 @@ namespace GrabScene {
 		this->index = 0;
 		this->lockIndex = false;
 		this->selectedNode = 0;
+		this->initialised = false;
 		
 		this->elements.push_back(new NullElement());
 		this->nodes.push_back(new NullNode());
 		
-		indexBuffer.allocate(512, 512, GL_RGB32F);
+		indexBuffer.allocate(512, 512, GL_RGBA32F);
 
 		this->add(handles.translateX);
 		this->add(handles.translateY);
@@ -39,14 +40,18 @@ namespace GrabScene {
 		ofAddListener(AssetRegister.evtLoad, this, &Scene::assetsLoad);
 		
 		this->camera = &camera;
+		this->initialised = true;
 		
 		AssetRegister.init();
-		handles.init();
-		
+		handles.init(camera);
 	}
 	
 	//----------
 	void Scene::draw() {
+		if (!this->initialised) {
+			ofSystemAlertDialog("You are calling ofxGrabScene::draw without first calling init, we're exiting!");
+			ofExit();
+		}
 		
 		ofPushStyle();
 		ofEnableAlphaBlending();
@@ -95,7 +100,7 @@ namespace GrabScene {
 		////
 		//nodeindexbuffer
 		if (nodeIndexBuffer.getWidth() != ofGetWidth() || nodeIndexBuffer.getHeight() != ofGetHeight()) {
-			nodeIndexBuffer.allocate(ofGetWidth(), ofGetHeight(), GL_RGB32F);
+			nodeIndexBuffer.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA32F);
 		}
 		nodeIndexBuffer.bind();
 		ofClear(0,0,0,0);
@@ -108,9 +113,11 @@ namespace GrabScene {
 		}
 		shader("index").end();
 		
-		GLfloat reading[3];
-		glReadPixels(ofGetMouseX(), ofGetHeight() - 1 - ofGetMouseY(), 1, 1, GL_RGB, GL_FLOAT, &reading);
+		GLfloat reading[4];
+		glReadPixels(ofGetMouseX(), ofGetHeight() - 1 - ofGetMouseY(), 1, 1, GL_RGBA, GL_FLOAT, &reading);
 		this->nodeUnderCursor =  reading[0] * GRABSCENE_INDEX_VALUE_SCALE;
+		if (this->index != 0)
+			this->nodeUnderCursor = 0;
 		
 		nodeIndexBuffer.unbind();
 		
@@ -142,7 +149,12 @@ namespace GrabScene {
 	//----------
 	void Scene::add(ofNode & node) {
 		BaseNode * newNode = new WrappedNode(node);
-		this->nodes.push_back(newNode);
+		this->add(newNode);
+	}
+	
+	//----------
+	void Scene::add(BaseNode * const node) {
+		this->nodes.push_back(node);
 	}
 
 	//----------
@@ -185,6 +197,7 @@ namespace GrabScene {
 				Handles::BaseHandle::disable();
 			else
 				Handles::BaseHandle::enable();
+			ofNotifyEvent(selectionChanged, this->selectedNode, this);
 		}
 	}
 	
@@ -308,8 +321,8 @@ namespace GrabScene {
 		glDisable(GL_DEPTH_TEST);
 		
 		if (!this->lockIndex) {
-			float rawValue[3];
-			glReadPixels(0, 0, 1, 1, GL_RGB, GL_FLOAT, &rawValue);
+			float rawValue[4];
+			glReadPixels(0, 0, 1, 1, GL_RGBA, GL_FLOAT, &rawValue);
 			unsigned short readIndex = rawValue[0] * float(GRABSCENE_INDEX_VALUE_SCALE) + 0.5f;
 			indexCachedFrame = ofGetFrameNum();
 			
@@ -379,6 +392,7 @@ namespace GrabScene {
 		this->cursor.worldViewFrameDifference = screenDiffNorm * viewMatrix.getInverse().getRotate();
 		float distance = (this->camera->getPosition() - this->cursor.world).length();
 		this->cursor.worldViewFrameDifference *= distance * tan(this->camera->getFov() * DEG_TO_RAD / 2.0f) * 2.0f * 2.0f;
+		this->cursor.worldViewFrameDifference.x *= ofGetWidth() / ofGetHeight();
 		//
 		///
 

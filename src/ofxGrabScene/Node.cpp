@@ -6,6 +6,8 @@
 
 namespace GrabScene {
 	//----------
+	
+	//----------
 	WrappedNode::WrappedNode(ofNode & node) {
 		this->node = &node;
 	}

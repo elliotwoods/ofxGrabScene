@@ -7,6 +7,7 @@
 namespace GrabScene {
 	//---------
 	BaseNode * Handles::BaseHandle::parent = 0;
+	ofCamera * Handles::BaseHandle::camera = 0;
 	float Handles::BaseHandle::scale = 1.0f;
 	bool Handles::BaseHandle::enabled = true;
 	
@@ -40,7 +41,12 @@ namespace GrabScene {
 	
 	//---------
 	void Handles::BaseHandle::setParent(BaseNode * node) {
-		parent = node;
+		Handles::BaseHandle::parent = node;
+	}
+	
+	//---------
+	void Handles::BaseHandle::setCamera(ofCamera & camera) {
+		Handles::BaseHandle::camera = &camera;
 	}
 	
 	//---------

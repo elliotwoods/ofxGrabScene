@@ -4,6 +4,8 @@
 //
 #pragma once
 
+#include "ofCamera.h"
+
 #include "Element.h"
 #include "Node.h"
 #include "Assets.h"
@@ -24,6 +26,7 @@ namespace GrabScene {
 			BaseHandle(Axis);
 			ofVec3f getDirection() const;
 			static void setParent(BaseNode * node);
+			static void setCamera(ofCamera &);
 			void cursorOver(const Cursor &);
 			void cursorOut(const Cursor &);
 			bool onTop() const { return true; }
@@ -33,6 +36,7 @@ namespace GrabScene {
 		protected:
 			Axis axis;
 			static BaseNode * parent;
+			static ofCamera * camera;
 			ofColor lineColor;
 			ofColor fillColor;
 			bool rollover;
@@ -73,13 +77,14 @@ namespace GrabScene {
 			void cursorDragged(const MovingCursor &);
 			
 		protected:
+			ofMatrix4x4 doTransform() const;
 			string getReading() const;
 			static ofMesh fill;
 			static ofMesh line;
 		};
 		
 		Handles();
-		void init();
+		void init(ofCamera &);
 		Translate translateX, translateY, translateZ, translateC;
 		Rotate rotateX, rotateY, rotateZ;
 	};

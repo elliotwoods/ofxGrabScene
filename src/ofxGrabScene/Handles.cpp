@@ -20,8 +20,9 @@ namespace GrabScene {
 	}
 	
 	//---------
-	void Handles::init() {
+	void Handles::init(ofCamera & camera) {
 		Translate::init();
 		Rotate::init();
+		BaseHandle::setCamera(camera);
 	}
 }

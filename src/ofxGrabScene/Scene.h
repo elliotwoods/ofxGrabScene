@@ -28,6 +28,7 @@ namespace GrabScene{
 			this->add(&element);
 		}
 		void add(ofNode & node);
+		void add(BaseNode * const node);
 		
 		bool hasSelection() const;
 		BaseNode & getSelectedNode();
@@ -38,6 +39,8 @@ namespace GrabScene{
 		
 		ofFbo & getIndexBuffer();
 		const MovingCursor & getCursor();
+		
+		ofEvent<const unsigned int> selectionChanged;
 	protected:
 		
 		////
@@ -59,6 +62,7 @@ namespace GrabScene{
 		
 		////
 		//general
+		bool initialised;
 		ofRectangle viewport;
 		ofMatrix4x4 viewMatrix;
 		GLdouble viewDoubles[16];

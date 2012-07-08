@@ -38,11 +38,13 @@ namespace GrabScene {
 		bool dragged;
 		
 		ofVec3f worldViewFrameDifference;
+		ofVec3f viewFrameDifference;
 		
 		float getAge() const;
 		ofVec2f getScreenFrameDifference() const;
 		ofVec3f getWorldFrameDifference() const;
 		ofVec2f getScreenVelocity() const;
+		ofVec3f getNormalisedScreenVelocity() const;
 		ofVec3f getWorldVelocity() const;
 		float getActionAmplitude() const;
 	};

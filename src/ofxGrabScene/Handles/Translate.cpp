@@ -195,15 +195,38 @@ namespace GrabScene {
 	
 	//---------
 	void Handles::Translate::cursorDragged(const MovingCursor & cursor) {
+		if (this->parent == 0) {
+			ofLogError("GrabScene") << "No parent node set for handle";
+			return;
+		}
+		if (this->camera == 0) {
+			ofLogError("GrabScene") << "No camera set for handle";
+			return;
+		}
+		
 		ofVec3f direction = this->getDirection();
 		ofVec3f movement;
 		if (this->axis == NO_AXIS) {
-			movement = cursor.worldViewFrameDifference;
+			movement = cursor.worldViewFrameDifference / 2;
 		} else {
-			movement = cursor.worldViewFrameDifference.dot(direction) * direction;
+			// s = start
+			// t = ray vector
+			// view = in camera view
+			const ofVec3f s = this->parent->getNode().getPosition();
+			const ofVec3f t = direction;
+			
+			ofVec3f sView = this->camera->worldToScreen(s);
+			ofVec3f tView = this->camera->worldToScreen(s + t) - sView;
+			ofVec3f dXY = cursor.getScreenFrameDifference();
+			
+			sView.z = 0.0f;
+			tView.z = 0.0f;
+			
+			movement = t * tView.dot(dXY) / (tView.length() * tView.length());
 		}
 		
-		if (this->parent != 0)
+		//check valid
+		if (movement.lengthSquared() == movement.lengthSquared())
 			this->parent->getNode().move(movement);
 	}
 	

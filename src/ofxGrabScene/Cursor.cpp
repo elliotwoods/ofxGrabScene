@@ -68,6 +68,15 @@ namespace GrabScene {
 	}
 	
 	//----------
+	ofVec3f MovingCursor::getNormalisedScreenVelocity() const {
+		ofVec3f v = this->getScreenVelocity();
+		v.z = 0.0f;
+		v.x /= ofGetWidth() / 2.0f;
+		v.y /= ofGetHeight() / 2.0f;
+		return v;
+	}
+	
+	//----------
 	ofVec3f MovingCursor::getWorldFrameDifference() const {
 		if (this->worldValid && this->lastFrame.worldValid)
 			return this->world - this->lastFrame.world;

@@ -87,9 +87,8 @@ namespace GrabScene {
 		if (hadLighting)
 			ofDisableLighting();
 		
-		parent->getNode().transformGL();
 		ofPushMatrix();
-		ofScale(scale, scale, scale);
+		this->doTransform();
 		
 		ofPushStyle();
 		shader("fixed").begin();
@@ -112,7 +111,6 @@ namespace GrabScene {
 		ofPopStyle();
 		
 		ofPopMatrix();
-		parent->getNode().restoreTransformGL();
 		
 		if (hadLighting)
 			ofEnableLighting();
@@ -123,21 +121,21 @@ namespace GrabScene {
 		if (parent == 0 || !this->enabled)
 			return;
 		
-		parent->getNode().transformGL();
 		ofPushMatrix();
-		ofScale(scale, scale, scale);
+		this->doTransform();
 		
 		this->rotateAxis();
 		fill.draw();
 		
 		ofPopMatrix();
-		parent->getNode().restoreTransformGL();
 	}
 	
 	//---------
 	void Handles::Rotate::cursorDragged(const MovingCursor & cursor) {
-		if (this->parent == 0)
+		if (this->parent == 0) {
+			ofLogError("GrabScene") << "No parent node set for handle";
 			return;
+		}
 		
 		ofNode & node(this->parent->getNode());
 		ofVec3f center = node.getPosition();
@@ -159,7 +157,16 @@ namespace GrabScene {
 		if (direction2.dot(direction) < 0.0f)
 			angle *= -1.0f;
 		
-		node.rotate(angle, direction);
+		//check valid
+		if (angle == angle && direction == direction)
+			node.rotate(angle, direction);
+	}
+	
+	//---------
+	ofMatrix4x4 Handles::Rotate::doTransform() const {
+		ofTranslate(parent->getNode().getPosition());
+		glMultMatrixf(ofMatrix4x4(parent->getNode().getOrientationQuat()).getPtr());
+		ofScale(scale, scale, scale);
 	}
 	
 	//---------
