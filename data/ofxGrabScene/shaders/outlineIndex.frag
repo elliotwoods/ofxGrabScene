@@ -1,3 +1,4 @@
+
 #version 120
 
 uniform sampler2DRect texIndex;
@@ -17,9 +18,9 @@ bool isElement(int index) {
 }
 
 void main() {
-	const int centerIndex = int(texture2DRect(texIndex, gl_TexCoord[0].xy).r);
-	const int centerElementIndex = centerIndex;
-	const int centerNodeIndex = centerIndex - elementCount;
+	int centerIndex = int(texture2DRect(texIndex, gl_TexCoord[0].xy).r);
+	int centerElementIndex = centerIndex;
+	int centerNodeIndex = centerIndex - elementCount;
 
 	int outerIndex;
 	int outerNodeIndex;

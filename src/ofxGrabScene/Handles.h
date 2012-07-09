@@ -37,7 +37,6 @@ namespace GrabScene {
 			Axis axis;
 			static BaseNode * parent;
 			static ofCamera * camera;
-			ofColor lineColor;
 			ofColor fillColor;
 			bool rollover;
 			static float scale;
@@ -45,7 +44,6 @@ namespace GrabScene {
 			
 			void rotateAxis() const;
 			void setStyleFill() const;
-			void setStyleLine() const;
 		private:
 			virtual string getReading() const = 0;
 		};
@@ -63,7 +61,6 @@ namespace GrabScene {
 		protected:
 			string getReading() const;
 			static ofMesh fill;
-			static ofMesh line;
 		};
 		
 		class Rotate : public BaseHandle {
@@ -80,7 +77,6 @@ namespace GrabScene {
 			void doTransform() const;
 			string getReading() const;
 			static ofMesh fill;
-			static ofMesh line;
 		};
 		
 		Handles();

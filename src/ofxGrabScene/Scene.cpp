@@ -149,16 +149,16 @@ namespace GrabScene {
 			//clear cut cases:
 			if (returnedIndex == 0) {
 				//we're not over anything
-				this->elementUnderCursor = 0;
-				this->nodeUnderCursor = 0;
+				this->setElementUnderCursor(0);
+				this->setNodeUnderCursor(0);
 			} else if (returnedIndex < this->elements.size()) {
 				//we're over an element
-				this->elementUnderCursor = returnedIndex;
-				this->nodeUnderCursor = 0;
+				this->setElementUnderCursor(returnedIndex);
+				this->setNodeUnderCursor(nodeUnderCursor);
 			} else if (returnedIndex - this->elements.size() < this->nodes.size()) {
 				//we're over a node
-				this->elementUnderCursor = 0;
-				this->nodeUnderCursor = returnedIndex - this->elements.size();
+				this->setElementUnderCursor(0);
+				this->setNodeUnderCursor(returnedIndex - this->elements.size());
 			} else {
 				//we're fucked
 				ofLogError("GrabScene") << "Error when checking what's under the cursor";
@@ -318,6 +318,24 @@ namespace GrabScene {
 		glMatrixMode(GL_MODELVIEW);
 		glPopMatrix();
 		glEnable(GL_DEPTH_TEST);
+	}
+	
+	//----------
+	void Scene::setNodeUnderCursor(uint16_t index) {
+		if (this->nodeUnderCursor == index || index >= this->nodes.size())
+			return;
+		this->nodes[nodeUnderCursor]->cursorOut(this->cursor);
+		this->nodeUnderCursor = index;
+		this->nodes[nodeUnderCursor]->cursorOver(this->cursor);
+	}
+	
+	//----------
+	void Scene::setElementUnderCursor(uint16_t index) {
+		if (this->elementUnderCursor == index || index >= this->nodes.size())
+			return;
+		this->elements[elementUnderCursor]->cursorOut(this->cursor);
+		this->elementUnderCursor = index;
+		this->elements[elementUnderCursor]->cursorOver(this->cursor);
 	}
 	
 	//----------

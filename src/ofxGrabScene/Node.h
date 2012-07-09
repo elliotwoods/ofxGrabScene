@@ -5,7 +5,9 @@
 #pragma once
 
 #include "ofNode.h"
+
 #include "Assets.h"
+#include "Cursor.h"
 
 namespace GrabScene {
 	class BaseNode {
@@ -13,6 +15,9 @@ namespace GrabScene {
 		virtual void draw() = 0;
 		virtual void drawStencil() = 0;
 		virtual ofNode & getNode() = 0;
+		
+		virtual void cursorOver(Cursor &) { }
+		virtual void cursorOut(Cursor &) { }
 		
 		void save(ofBuffer &);
 		void load(ofBuffer &);

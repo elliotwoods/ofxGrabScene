@@ -7,7 +7,6 @@
 namespace GrabScene {
 	//---------
 	ofMesh Handles::Rotate::fill = ofMesh();
-	ofMesh Handles::Rotate::line = ofMesh();
 	
 	//---------
 	Handles::Rotate::Rotate(Axis axis) : BaseHandle(axis) {
@@ -29,39 +28,20 @@ namespace GrabScene {
 		//inner ring
 		for (int i=0; i<resolution; i++) {
 			theta = (float) i / (float) resolution * TWO_PI;
-			line.addVertex(ofVec3f(radius * cos(theta), radius * sin(theta), 0.0f));
+			fill.addVertex(ofVec3f(radius * cos(theta), radius * sin(theta), 0.0f));
 		}
 						   
 		//outer ring
 		for (int i=0; i<resolution; i++) {
 			theta = ((float) i + 0.5f) / (float) resolution * TWO_PI;
-			line.addVertex(ofVec3f((radius + width) * cos(theta), (radius + width) * sin(theta), 0.0f));
+			fill.addVertex(ofVec3f((radius + width) * cos(theta), (radius + width) * sin(theta), 0.0f));
 		}
-		
-		fill.addVertices(line.getVertices());
 		//
 		////
 		
 		
 		////
 		//indices
-		
-		//line
-		
-		//inner ring
-		for (int i=0; i<resolution; i++) {
-			line.addIndex(i);
-			line.addIndex((i+1) % resolution);
-		}
-
-		//inner ring
-		for (int i=0; i<resolution; i++) {
-			line.addIndex(i + resolution);
-			line.addIndex(((i+1) % resolution) + resolution);
-		}
-		
-		
-		//fill
 		for (int i=0; i<resolution+1; i++) {
 			fill.addIndex(i % resolution);
 			fill.addIndex((i % resolution) + resolution);
@@ -71,7 +51,6 @@ namespace GrabScene {
 		
 		////
 		//styles
-		line.setMode(OF_PRIMITIVE_LINES);
 		fill.setMode(OF_PRIMITIVE_TRIANGLE_STRIP);
 		//
 		////
@@ -96,8 +75,6 @@ namespace GrabScene {
 		this->rotateAxis();
 		this->setStyleFill();
 		fill.draw();
-		this->setStyleLine();
-		line.draw();
 		
 		shader("fixed").end();
 		

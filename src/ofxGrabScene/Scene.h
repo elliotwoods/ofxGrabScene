@@ -93,6 +93,9 @@ namespace GrabScene{
 		//
 		bool lockIndex;
 		//
+		void setElementUnderCursor(uint16_t);
+		void setNodeUnderCursor(uint16_t);
+		//
 		////
 
 		

@@ -19,22 +19,18 @@ namespace GrabScene {
 		switch (this->axis) {
 			case X_AXIS:
 				this->fillColor.setHsb(0, GRABSCENE_HANDLES_SATURATION, GRABSCENE_HANDLES_FILL_BRIGHTNESS);
-				this->lineColor.setHsb(0, 0, GRABSCENE_HANDLES_LINE_BRIGHTNESS, 0);
 				break;
 				
 			case Y_AXIS:
 				this->fillColor.setHsb(255/3, GRABSCENE_HANDLES_SATURATION, GRABSCENE_HANDLES_FILL_BRIGHTNESS);
-				this->lineColor.setHsb(255/3, 0, GRABSCENE_HANDLES_LINE_BRIGHTNESS, 0);
 				break;
 				
 			case Z_AXIS:
 				this->fillColor.setHsb(255/3*2, GRABSCENE_HANDLES_SATURATION, GRABSCENE_HANDLES_FILL_BRIGHTNESS);
-				this->lineColor.setHsb(255/3*2, 0, GRABSCENE_HANDLES_LINE_BRIGHTNESS, 0);
 				break;
 				
 			case NO_AXIS:
 				this->fillColor = ofColor(200,200,200);
-				this->lineColor = ofColor(GRABSCENE_HANDLES_LINE_BRIGHTNESS,GRABSCENE_HANDLES_LINE_BRIGHTNESS,GRABSCENE_HANDLES_LINE_BRIGHTNESS, 0);
 				break;
 		}
 	}
@@ -86,16 +82,6 @@ namespace GrabScene {
 		ofFill();
 		ofSetLineWidth(0.0f);
 		ofSetColor(this->fillColor);
-	}
-	
-	//---------
-	void Handles::BaseHandle::setStyleLine() const {
-		ofNoFill();
-		ofSetLineWidth(2.0f);
-		if (this->rollover)
-			ofSetColor(255, 255, 255, 255);
-		else
-			ofSetColor(this->lineColor);
 	}
 
 	//---------
