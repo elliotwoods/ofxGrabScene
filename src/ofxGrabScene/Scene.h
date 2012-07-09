@@ -91,7 +91,7 @@ namespace GrabScene{
 		uint16_t nodeUnderCursor; 
 		uint16_t nodeSelected;
 		//
-		bool lockElementIndex;
+		bool lockIndex;
 		//
 		////
 

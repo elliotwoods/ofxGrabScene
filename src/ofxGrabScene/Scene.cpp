@@ -12,6 +12,7 @@ namespace GrabScene {
 		this->nodeUnderCursor = false;
 		this->nodeSelected = 0;
 		this->initialised = false;
+		this->lockIndex = false;
 		
 		this->elements.push_back(new NullElement());
 		this->nodes.push_back(new NullNode());
@@ -95,6 +96,7 @@ namespace GrabScene {
 		//indexBuffer
 		/////////////
 		//
+		
 		if (indexBuffer.getWidth() != ofGetWidth() || indexBuffer.getHeight() != ofGetHeight()) {
 			indexBuffer.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA32F);
 		}
@@ -136,35 +138,34 @@ namespace GrabScene {
 			}
 			index++;
 		}
-
-		glReadPixels(ofGetMouseX(), ofGetHeight() - 1 - ofGetMouseY(), 1, 1, GL_RGBA, GL_FLOAT, &reading);
-		const uint16_t reading2 = reading.x;
-
-		uint16_t returnedIndex = reading2 != 0 ? reading2 : reading1;
-
-		this->indexBuffer.unbind();
 		shader("index").end();
 
-		//clear cut cases:
-		if (returnedIndex == 0) {
-			//we're not over anything
-			if (!lockElementIndex)
+		if (!this->lockIndex) {
+			glReadPixels(ofGetMouseX(), ofGetHeight() - 1 - ofGetMouseY(), 1, 1, GL_RGBA, GL_FLOAT, &reading);
+			const uint16_t reading2 = reading.x;
+
+			uint16_t returnedIndex = reading2 != 0 ? reading2 : reading1;
+
+			//clear cut cases:
+			if (returnedIndex == 0) {
+				//we're not over anything
 				this->elementUnderCursor = 0;
-			this->nodeUnderCursor = 0;
-		} else if (returnedIndex < this->elements.size()) {
-			//we're over an element
-			if (!lockElementIndex)
+				this->nodeUnderCursor = 0;
+			} else if (returnedIndex < this->elements.size()) {
+				//we're over an element
 				this->elementUnderCursor = returnedIndex;
-			this->nodeUnderCursor = 0;
-		} else if (returnedIndex - this->elements.size() < this->nodes.size()) {
-			//we're over a node
-			if (!lockElementIndex)
+				this->nodeUnderCursor = 0;
+			} else if (returnedIndex - this->elements.size() < this->nodes.size()) {
+				//we're over a node
 				this->elementUnderCursor = 0;
-			this->nodeUnderCursor = returnedIndex - this->elements.size();
-		} else {
-			//we're fucked
-			ofLogError("GrabScene") << "Error when checking what's under the cursor";
+				this->nodeUnderCursor = returnedIndex - this->elements.size();
+			} else {
+				//we're fucked
+				ofLogError("GrabScene") << "Error when checking what's under the cursor";
+			}
 		}
+
+		this->indexBuffer.unbind();
 		//
 		////
 
@@ -412,7 +413,7 @@ namespace GrabScene {
 		if (cursor.captured) {
 			this->camera->setMouseActions(false);
 		}
-		this->lockElementIndex = true;
+		this->lockIndex = true;
 	}
 	
 	//----------
@@ -421,7 +422,7 @@ namespace GrabScene {
 		this->cursor.end(args.button);
 		this->getElementUnderCursor().cursorReleased(this->cursor);
 		this->camera->setMouseActions(true);
-		this->lockElementIndex = false;
+		this->lockIndex = false;
 		
 		//click
 		if (!this->cursor.dragged && this->elementUnderCursor==0) {
