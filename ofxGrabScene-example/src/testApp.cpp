@@ -15,6 +15,8 @@ void testApp::setup(){
 	for (int i=0; i<nodes.size(); i++)
 		scene.add(nodes[i]);
 	
+	scene.add(new GrabScene::Nodes::Grid);
+	
 	camera.setPosition(2.0f, 2.0f, 2.0f);
 	camera.lookAt(ofVec3f(0.0f, 0.0f, 0.0f));
 	
@@ -30,19 +32,12 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	
 	ofBackground(40);
-	camera.begin();
 	light.enable();
 	
-	ofDrawGrid(10.0f);
 	scene.draw();
 	
 	light.disable();
-	ofDisableLighting();
-	camera.end();
-	
-//	scene.getIndexBuffer().draw(0,0);
 }
 
 //--------------------------------------------------------------

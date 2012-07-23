@@ -15,6 +15,9 @@
 #include "Cursor.h"
 #include "Assets.h"
 #include "Handles.h"
+#include "Gui/Panel.h"
+
+#define GRABSCENE_INDEX_SCALE float(1 << 10)
 
 namespace GrabScene{
 	class Scene : public ofNode {
@@ -27,8 +30,12 @@ namespace GrabScene{
 		void add(Element & element) {
 			this->add(&element);
 		}
+		
 		void add(ofNode & node);
 		void add(BaseNode * const node);
+		void add(BaseNode & node) {
+			this->add(&node);
+		}
 		
 		bool hasSelection() const;
 		BaseNode & getSelectedNode();
@@ -118,14 +125,22 @@ namespace GrabScene{
 		////
 		//events
 		//
-		void	update(ofEventArgs & args);
-		void    mouseMoved(ofMouseEventArgs & args);
-		void	mousePressed(ofMouseEventArgs & args);
-		void	mouseReleased(ofMouseEventArgs & args);
-		void	mouseDragged(ofMouseEventArgs & args);
-		void	keyPressed(ofKeyEventArgs & args);
-		void	keyReleased(ofKeyEventArgs & args);
-		void	assetsLoad(Assets &);
+		void update(ofEventArgs & args);
+		void mouseMoved(ofMouseEventArgs & args);
+		void mousePressed(ofMouseEventArgs & args);
+		void mouseReleased(ofMouseEventArgs & args);
+		void mouseDragged(ofMouseEventArgs & args);
+		void keyPressed(ofKeyEventArgs & args);
+		void keyReleased(ofKeyEventArgs & args);
+		void assetsLoad(Assets &);
+		//
+		////
+		
+		
+		////
+		//gui
+		//
+		Panel inspector;
 		//
 		////
 	};

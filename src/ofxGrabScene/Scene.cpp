@@ -42,6 +42,7 @@ namespace GrabScene {
 		
 		AssetRegister.init();
 		handles.init(camera);
+		inspector.setup();
 	}
 	
 	//----------
@@ -53,6 +54,7 @@ namespace GrabScene {
 		
 		ofPushStyle();
 		ofEnableAlphaBlending();
+		this->camera->begin();
 		
 		////
 		//nodes
@@ -103,6 +105,8 @@ namespace GrabScene {
 
 		indexBuffer.bind();
 		shader("index").begin();
+		shader("index").setUniform1f("indexScaling", GRABSCENE_INDEX_SCALE);
+		
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 		//draws an index at each pixel for elements and nodes underneath
@@ -125,12 +129,12 @@ namespace GrabScene {
 
 		ofVec4f reading;
 		glReadPixels(ofGetMouseX(), ofGetHeight() - 1 - ofGetMouseY(), 1, 1, GL_RGBA, GL_FLOAT, &reading.x);
-		const uint16_t reading1 = reading.x;
+		const uint16_t reading1 = reading.x * GRABSCENE_INDEX_SCALE;
 
 		//now redraw but with onTop elements
 		glClear(GL_DEPTH_BUFFER_BIT);
 		index = 0;
-
+		
 		for (itE = this->elements.begin(); itE != this->elements.end(); itE++) {
 			if ((*itE)->onTop()) {
 				shader("index").setUniform1i("index", index);
@@ -142,8 +146,8 @@ namespace GrabScene {
 
 		if (!this->lockIndex) {
 			glReadPixels(ofGetMouseX(), ofGetHeight() - 1 - ofGetMouseY(), 1, 1, GL_RGBA, GL_FLOAT, &reading);
-			const uint16_t reading2 = reading.x;
-
+			const uint16_t reading2 = reading.x * GRABSCENE_INDEX_SCALE;
+			
 			uint16_t returnedIndex = reading2 != 0 ? reading2 : reading1;
 
 			//clear cut cases:
@@ -179,6 +183,7 @@ namespace GrabScene {
 		outlineShader.setUniform1i("nodeHover", this->nodeUnderCursor);
 		outlineShader.setUniformTexture("texIndex", indexBuffer, 2);
 		outlineShader.setUniform1i("elementCount", this->elements.size());
+		outlineShader.setUniform1f("indexScaling", GRABSCENE_INDEX_SCALE);
 		drawFullscreen(indexBuffer);
 		outlineShader.end();
 		//
@@ -194,6 +199,17 @@ namespace GrabScene {
 		glGetFloatv(GL_PROJECTION_MATRIX, projectionMatrix.getPtr());
 		glGetDoublev(GL_MODELVIEW_MATRIX, viewDoubles);
 		glGetDoublev(GL_PROJECTION_MATRIX, projectionDoubles);
+		//
+		////
+		
+		this->camera->end();
+		
+		////
+		//2D elements
+		//
+		shader("noLight").begin();
+		inspector.draw();
+		shader("noLight").end();
 		//
 		////
 	}
@@ -249,7 +265,10 @@ namespace GrabScene {
 			ofLogError("GrabScene") << "Node index " << index << " is outside the range of available nodes, selecting null node";
 		} else {
 			this->nodeSelected = index;
+			
 			Handles::BaseHandle::setParent(this->getSelectedNode());
+			inspector.setTarget(this->getSelectedNode());
+			
 			if (index == 0)
 				Handles::BaseHandle::disable();
 			else
@@ -344,8 +363,12 @@ namespace GrabScene {
 		
 		////
 		//screen
+		//
+		
+		//consider that these should be in viewport space
 		this->cursor.screen.x = ofGetMouseX();
 		this->cursor.screen.y = ofGetMouseY();
+		
 		//
 		////
 		
@@ -356,7 +379,7 @@ namespace GrabScene {
 		
 		//we presume we're using the stencil buffer which has 1,1 resolution
 		//in order for this to be true, the update must be called when the fbo is attached
-		glReadPixels(0, 0, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+		glReadPixels(this->cursor.screen.x, this->cursor.screen.y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
 
 		if (depth == 1.0f) {
 			this->cursor.world = ofVec3f(0,0,0);
@@ -428,6 +451,15 @@ namespace GrabScene {
 		
 		this->getElementUnderCursor().cursorDown(cursor);
 		
+		if (this->inspector.getShape().inside(this->cursor.screen.x, this->cursor.screen.y)) {
+			
+			//we're inside the gui
+			cursor.captured = true;
+			
+			//horrible hack to stop mouse clicks in gui affecting node selection
+			cursor.dragged = true;
+		}
+		
 		if (cursor.captured) {
 			this->camera->setMouseActions(false);
 		}
@@ -470,6 +502,6 @@ namespace GrabScene {
 	
 	//----------
 	void Scene::assetsLoad(GrabScene::Assets &assets) {
-		
+
 	}
 }

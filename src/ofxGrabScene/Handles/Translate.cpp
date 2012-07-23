@@ -187,8 +187,10 @@ namespace GrabScene {
 		}
 		
 		//check valid
-		if (movement.lengthSquared() == movement.lengthSquared())
+		if (movement.lengthSquared() == movement.lengthSquared()) {
 			this->parent->getNode().move(movement);
+			this->parent->updateTranslate();
+		}
 	}
 	
 	//---------

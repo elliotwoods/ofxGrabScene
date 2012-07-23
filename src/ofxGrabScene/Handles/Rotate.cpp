@@ -135,8 +135,10 @@ namespace GrabScene {
 			angle *= -1.0f;
 		
 		//check valid
-		if (angle == angle && direction == direction)
+		if (angle == angle && direction == direction) {
 			node.rotate(angle, direction);
+			this->parent->updateRotate();
+		}
 	}
 	
 	//---------

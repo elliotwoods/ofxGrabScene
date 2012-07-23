@@ -1,6 +1,8 @@
 
 #version 120
 
+uniform float indexScaling;
+
 uniform sampler2DRect texIndex;
 uniform float width = 2.; // measured in texture coordinates
 
@@ -18,7 +20,7 @@ bool isElement(int index) {
 }
 
 void main() {
-	int centerIndex = int(texture2DRect(texIndex, gl_TexCoord[0].xy).r);
+	int centerIndex = int(texture2DRect(texIndex, gl_TexCoord[0].xy).r * indexScaling);
 	int centerElementIndex = centerIndex;
 	int centerNodeIndex = centerIndex - elementCount;
 
@@ -43,7 +45,7 @@ void main() {
 			
 			coord = gl_TexCoord[0].xy + vec2(x, y);
 
-			outerIndex = int(texture2DRect(texIndex, coord).r);
+			outerIndex = int(texture2DRect(texIndex, coord).r * indexScaling);
 			outerNodeIndex = outerIndex - elementCount;
 
 			//selection
@@ -75,7 +77,7 @@ void main() {
 				continue;
 
 			coord = gl_TexCoord[0].xy + vec2(x, y);
-			outerIndex = int(texture2DRect(texIndex, coord).r);
+			outerIndex = int(texture2DRect(texIndex, coord).r * indexScaling);
 
 			lookup = outerIndex == elementHover;
 			if (lookup != centerHover && elementHover > 0 && (isElement(outerIndex) || isElement(centerIndex)))
