@@ -11,8 +11,8 @@ namespace GrabScene {
 		this->translate.setName("Translate");
 		this->rotate.setName("Rotate");
 		
-		this->translate.setMin(ofVec3f(-100.0f));
-		this->translate.setMax(ofVec3f(-100.0f));
+		this->translate.setMin(ofVec3f(-10.0f));
+		this->translate.setMax(ofVec3f(+10.0f));
 		
 		this->parameters.add(this->translate);
 		//this->parameters.add(this->rotate);
@@ -70,5 +70,11 @@ namespace GrabScene {
 	//----------
 	ofNode & WrappedNode::getNode() {
 		return *this->node;
+	}
+    
+#pragma mark NullNode
+    //----------
+	NullNode::NullNode() {
+		this->parameters.clear();
 	}
 }

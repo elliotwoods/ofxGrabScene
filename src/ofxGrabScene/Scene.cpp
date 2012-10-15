@@ -14,8 +14,8 @@ namespace GrabScene {
 		this->initialised = false;
 		this->lockIndex = false;
 		
-		this->elements.push_back(new NullElement());
-		this->nodes.push_back(new NullNode());
+		this->add(new NullElement());
+		this->add(new NullNode());
 		
 		this->add(handles.translateX);
 		this->add(handles.translateY);
@@ -52,146 +52,17 @@ namespace GrabScene {
 			ofExit();
 		}
 		
-		ofPushStyle();
-		ofEnableAlphaBlending();
 		this->camera->begin();
 		
-		////
-		//nodes
-		node_iterator itN;
-		for (itN = this->nodes.begin(); itN != this->nodes.end(); itN++) {
-			(*itN)->draw();
-		}
-		//
-		////
+		ofPushStyle();
+		ofEnableAlphaBlending();
 		
-		
-		////		
-		//elements
-		const_element_iterator itE;
-		for (itE = elements.begin(); itE != elements.end(); itE++) {
-			if (!(**itE).onTop())
-				(**itE).draw();
-		}
-		//onTop
-		if (frameBuffer.getWidth() != ofGetWidth() || frameBuffer.getHeight() != ofGetHeight()) {
-			frameBuffer.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA, 4);
-		}
-		//
-		frameBuffer.bind();
-		ofClear(0,0,0,0);
-		for (itE = elements.begin(); itE != elements.end(); itE++) {
-			if ((**itE).onTop())
-				(**itE).draw();
-		}
-		frameBuffer.unbind();
-		glColor4f(1.0f, 1.0f, 1.0f, 0.8f);
-		shader("constant").begin();
-		shader("constant").setUniformTexture("tex", frameBuffer, 0);
-		drawFullscreen(frameBuffer);
-		shader("constant").end();
-		//
-		////
-		
-		
-		/////////////
-		//indexBuffer
-		/////////////
-		//
-		
-		if (indexBuffer.getWidth() != ofGetWidth() || indexBuffer.getHeight() != ofGetHeight()) {
-			indexBuffer.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA32F);
-		}
-
-		indexBuffer.bind();
-		shader("index").begin();
-		shader("index").setUniform1f("indexScaling", GRABSCENE_INDEX_SCALE);
-		
-		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
-		//draws an index at each pixel for elements and nodes underneath
-		//first elements, then nodes
-		int index = 0;
-		
-		for (itE = this->elements.begin(); itE != this->elements.end(); itE++) {
-			if (!(*itE)->onTop()) {
-				shader("index").setUniform1i("index", index);
-				(*itE)->drawStencil();
-			}
-			index++;
-		}
-
-		for (itN = this->nodes.begin(); itN != this->nodes.end(); itN++) {
-			shader("index").setUniform1i("index", index);
-			(*itN)->drawStencil();
-			index++;
-		}
-
-		ofVec4f reading;
-		glReadPixels(ofGetMouseX(), ofGetHeight() - 1 - ofGetMouseY(), 1, 1, GL_RGBA, GL_FLOAT, &reading.x);
-		const uint16_t reading1 = reading.x * GRABSCENE_INDEX_SCALE;
-
-		//now redraw but with onTop elements
-		glClear(GL_DEPTH_BUFFER_BIT);
-		index = 0;
-		
-		for (itE = this->elements.begin(); itE != this->elements.end(); itE++) {
-			if ((*itE)->onTop()) {
-				shader("index").setUniform1i("index", index);
-				(*itE)->drawStencil();
-			}
-			index++;
-		}
-		shader("index").end();
-
-		if (!this->lockIndex) {
-			glReadPixels(ofGetMouseX(), ofGetHeight() - 1 - ofGetMouseY(), 1, 1, GL_RGBA, GL_FLOAT, &reading);
-			const uint16_t reading2 = reading.x * GRABSCENE_INDEX_SCALE;
-			
-			uint16_t returnedIndex = reading2 != 0 ? reading2 : reading1;
-
-			//clear cut cases:
-			if (returnedIndex == 0) {
-				//we're not over anything
-				this->setElementUnderCursor(0);
-				this->setNodeUnderCursor(0);
-			} else if (returnedIndex < this->elements.size()) {
-				//we're over an element
-				this->setElementUnderCursor(returnedIndex);
-				this->setNodeUnderCursor(nodeUnderCursor);
-			} else if (returnedIndex - this->elements.size() < this->nodes.size()) {
-				//we're over a node
-				this->setElementUnderCursor(0);
-				this->setNodeUnderCursor(returnedIndex - this->elements.size());
-			} else {
-				//we're fucked
-				ofLogError("GrabScene") << "Error when checking what's under the cursor";
-			}
-		}
-
-		this->indexBuffer.unbind();
-		//
-		////
-
-
-		////
-		//draw outlines
-		ofShader & outlineShader(shader("outlineIndex"));
-		outlineShader.begin();
-		outlineShader.setUniform1i("elementHover", this->elementUnderCursor);
-		outlineShader.setUniform1i("nodeSelection", this->nodeSelected);
-		outlineShader.setUniform1i("nodeHover", this->nodeUnderCursor);
-		outlineShader.setUniformTexture("texIndex", indexBuffer, 2);
-		outlineShader.setUniform1i("elementCount", this->elements.size());
-		outlineShader.setUniform1f("indexScaling", GRABSCENE_INDEX_SCALE);
-		drawFullscreen(indexBuffer);
-		outlineShader.end();
-		//
-		////
+		this->drawNodesAndElements();
+		this->drawIndexBuffer();
+		this->drawOutlines();
 		
 		ofPopStyle();
 		
-
 		////
 		//cache values for unprojection of mouse
 		this->viewport = ofGetCurrentViewport();
@@ -204,14 +75,21 @@ namespace GrabScene {
 		
 		this->camera->end();
 		
-		////
-		//2D elements
-		//
-		shader("noLight").begin();
-		inspector.draw();
-		shader("noLight").end();
-		//
-		////
+		this->drawOverlay();
+	}
+	
+	//----------
+	void Scene::draw(ofFbo & fbo) {
+		fbo.bind();
+		
+		ofPushMatrix();
+		//ofScale(1.0f, -1.0f);
+		//ofTranslate(0.0f, -ofGetHeight());
+		
+		this->draw();
+		ofPopMatrix();
+		
+		fbo.unbind();
 	}
 	
 	//----------
@@ -228,6 +106,8 @@ namespace GrabScene {
 	//----------
 	void Scene::add(BaseNode * const node) {
 		this->nodes.push_back(node);
+        this->nodes.back()->updateTranslate();
+        this->nodes.back()->updateRotate();        
 	}
 
 	//----------
@@ -340,6 +220,144 @@ namespace GrabScene {
 	}
 	
 	//----------
+	void Scene::drawNodesAndElements() {
+		////
+		//nodes
+		node_iterator itN;
+		for (itN = this->nodes.begin(); itN != this->nodes.end(); itN++) {
+			(*itN)->draw();
+		}
+		//
+		////
+		
+		
+		////
+		//elements
+		const_element_iterator itE;
+		for (itE = elements.begin(); itE != elements.end(); itE++) {
+			if (!(**itE).onTop())
+				(**itE).draw();
+		}
+		//onTop
+		if (frameBuffer.getWidth() != ofGetWidth() || frameBuffer.getHeight() != ofGetHeight()) {
+			frameBuffer.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA, 4);
+		}
+		//
+		frameBuffer.bind();
+		ofClear(0,0,0,0);
+		for (itE = elements.begin(); itE != elements.end(); itE++) {
+			if ((**itE).onTop())
+				(**itE).draw();
+		}
+		frameBuffer.unbind();
+		glColor4f(1.0f, 1.0f, 1.0f, 0.8f);
+		shader("constant").begin();
+		shader("constant").setUniformTexture("tex", frameBuffer, 0);
+		drawFullscreen(frameBuffer);
+		shader("constant").end();
+		//
+		////
+	}
+	
+	//----------
+	void Scene::drawIndexBuffer() {
+		if (indexBuffer.getWidth() != ofGetWidth() || indexBuffer.getHeight() != ofGetHeight()) {
+			indexBuffer.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA32F);
+		}
+		
+		indexBuffer.bind();
+		shader("index").begin();
+		shader("index").setUniform1f("indexScaling", GRABSCENE_INDEX_SCALE);
+		
+		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+		
+		//draws an index at each pixel for elements and nodes underneath
+		//first elements, then nodes
+		int index = 0;
+		
+		for (element_iterator itE = this->elements.begin(); itE != this->elements.end(); itE++) {
+			if (!(*itE)->onTop()) {
+				shader("index").setUniform1i("index", index);
+				(*itE)->drawStencil();
+			}
+			index++;
+		}
+		
+		for (node_iterator itN = this->nodes.begin(); itN != this->nodes.end(); itN++) {
+			shader("index").setUniform1i("index", index);
+			(*itN)->drawStencil();
+			index++;
+		}
+		
+		ofVec4f reading;
+		glReadPixels(ofGetMouseX(), ofGetHeight() - 1 - ofGetMouseY(), 1, 1, GL_RGBA, GL_FLOAT, &reading.x);
+		const uint16_t reading1 = reading.x * GRABSCENE_INDEX_SCALE;
+		
+		//now redraw but with onTop elements
+		glClear(GL_DEPTH_BUFFER_BIT);
+		index = 0;
+		
+		for (element_iterator itE = this->elements.begin(); itE != this->elements.end(); itE++) {
+			if ((*itE)->onTop()) {
+				shader("index").setUniform1i("index", index);
+				(*itE)->drawStencil();
+			}
+			index++;
+		}
+		shader("index").end();
+		
+		if (!this->lockIndex) {
+			glReadPixels(ofGetMouseX(), ofGetHeight() - 1 - ofGetMouseY(), 1, 1, GL_RGBA, GL_FLOAT, &reading);
+			const uint16_t reading2 = reading.x * GRABSCENE_INDEX_SCALE;
+			
+			uint16_t returnedIndex = reading2 != 0 ? reading2 : reading1;
+			
+			//clear cut cases:
+			if (returnedIndex == 0) {
+				//we're not over anything
+				this->setElementUnderCursor(0);
+				this->setNodeUnderCursor(0);
+			} else if (returnedIndex < this->elements.size()) {
+				//we're over an element
+				this->setElementUnderCursor(returnedIndex);
+				this->setNodeUnderCursor(nodeUnderCursor);
+			} else if (returnedIndex - this->elements.size() < this->nodes.size()) {
+				//we're over a node
+				this->setElementUnderCursor(0);
+				this->setNodeUnderCursor(returnedIndex - this->elements.size());
+			} else {
+				//we're fucked
+				ofLogError("GrabScene") << "Error when checking what's under the cursor";
+			}
+			
+			cout << "reading: " << reading << ", reading1=" << reading1 << ", reading2=" << reading2 << ", returnedIndex=" << returnedIndex << endl;
+		}
+		
+		this->indexBuffer.unbind();
+	}
+	
+	//----------
+	void Scene::drawOutlines() {
+		ofShader & outlineShader(shader("outlineIndex"));
+		outlineShader.begin();
+		outlineShader.setUniform1i("elementHover", this->elementUnderCursor);
+		outlineShader.setUniform1i("nodeSelection", this->nodeSelected);
+		outlineShader.setUniform1i("nodeHover", this->nodeUnderCursor);
+		outlineShader.setUniformTexture("texIndex", indexBuffer, 2);
+		outlineShader.setUniform1i("elementCount", this->elements.size());
+		outlineShader.setUniform1f("indexScaling", GRABSCENE_INDEX_SCALE);
+		drawFullscreen(indexBuffer);
+		outlineShader.end();
+	}
+	
+	//----------
+	void Scene::drawOverlay() {
+		shader("noLight").begin();
+		inspector.draw();
+		shader("noLight").end();
+	}
+	
+	//----------
 	void Scene::setNodeUnderCursor(uint16_t index) {
 		if (this->nodeUnderCursor == index || index >= this->nodes.size())
 			return;
@@ -350,7 +368,7 @@ namespace GrabScene {
 	
 	//----------
 	void Scene::setElementUnderCursor(uint16_t index) {
-		if (this->elementUnderCursor == index || index >= this->nodes.size())
+		if (this->elementUnderCursor == index || index >= this->elements.size())
 			return;
 		this->elements[elementUnderCursor]->cursorOut(this->cursor);
 		this->elementUnderCursor = index;
@@ -358,7 +376,7 @@ namespace GrabScene {
 	}
 	
 	//----------
-	void Scene::updateCursor() {
+	void Scene::updateCursor(ofFbo * fbo) {
 		this->cursor.lastFrame = this->cursor;
 		
 		////
@@ -377,9 +395,18 @@ namespace GrabScene {
 		//world
 		float depth;
 		
+		if (fbo == 0) {
+			//not drawing to framebuffer
+			glReadPixels(this->cursor.screen.x, this->cursor.screen.y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+		} else {
+			fbo->getDepthTexture().bind();
+			glReadPixels(this->cursor.screen.x, this->cursor.screen.y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+			fbo->getDepthTexture().unbind();
+		}
+		
 		//we presume we're using the stencil buffer which has 1,1 resolution
 		//in order for this to be true, the update must be called when the fbo is attached
-		glReadPixels(this->cursor.screen.x, this->cursor.screen.y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+
 
 		if (depth == 1.0f) {
 			this->cursor.world = ofVec3f(0,0,0);

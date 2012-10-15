@@ -60,6 +60,7 @@ namespace GrabScene {
 	
 	class NullNode : public BaseNode {
 	public:
+        NullNode();
 		void draw() { };
 		void drawStencil() { };
 		ofNode & getNode() { return node; };

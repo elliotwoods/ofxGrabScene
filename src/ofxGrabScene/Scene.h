@@ -25,6 +25,7 @@ namespace GrabScene{
 		Scene();
 		void init(ofxGrabCam & camera);
 		void draw();
+		void draw(ofFbo &);
 		
 		void add(Element *);
 		void add(Element & element) {
@@ -82,9 +83,19 @@ namespace GrabScene{
 		
 		
 		////
-		//graphics
+		//utility
 		//
 		void drawFullscreen(ofBaseHasTexture &);
+		//
+		////
+		
+		
+		////
+		//graphics
+		void drawNodesAndElements();
+		void drawIndexBuffer();
+		void drawOutlines();
+		void drawOverlay();
 		ofFbo frameBuffer;
 		//
 		////
@@ -109,7 +120,7 @@ namespace GrabScene{
 		////
 		//cursor
 		//
-		void updateCursor();
+		void updateCursor(ofFbo * fbo = 0);
 		//
 		////
 		

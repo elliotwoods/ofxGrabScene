@@ -20,4 +20,6 @@ public:
 	ofxGrabScene scene; 
 	
 	vector<testNode> nodes;
+    
+	ofFbo fbo;
 };
