@@ -98,16 +98,18 @@ namespace GrabScene {
 	}
 	
 	//----------
-	void Scene::add(ofNode & node) {
+	BaseNode * Scene::add(ofNode & node) {
 		BaseNode * newNode = new WrappedNode(node);
 		this->add(newNode);
+		return newNode;
 	}
 	
 	//----------
-	void Scene::add(BaseNode * const node) {
+	BaseNode * Scene::add(BaseNode * const node) {
 		this->nodes.push_back(node);
         this->nodes.back()->updateTranslate();
-        this->nodes.back()->updateRotate();        
+        this->nodes.back()->updateRotate();
+		return node;
 	}
 
 	//----------
@@ -329,8 +331,6 @@ namespace GrabScene {
 				//we're fucked
 				ofLogError("GrabScene") << "Error when checking what's under the cursor";
 			}
-			
-			cout << "reading: " << reading << ", reading1=" << reading1 << ", reading2=" << reading2 << ", returnedIndex=" << returnedIndex << endl;
 		}
 		
 		this->indexBuffer.unbind();

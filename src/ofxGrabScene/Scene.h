@@ -32,11 +32,11 @@ namespace GrabScene{
 			this->add(&element);
 		}
 		
-		void add(ofNode & node);
-		void add(BaseNode * const node);
-		void add(BaseNode & node) {
-			this->add(&node);
+		BaseNode * add(BaseNode & node) {
+			return this->add(&node);
 		}
+		BaseNode * add(ofNode & node);
+		BaseNode * add(BaseNode * const node);
 		
 		bool hasSelection() const;
 		BaseNode & getSelectedNode();
