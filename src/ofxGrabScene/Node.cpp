@@ -32,7 +32,7 @@ namespace GrabScene {
 	
 	//----------
 	void BaseNode::updateTranslate() {
-		this->translate.setValue(this->getNode().getPosition());
+		this->translate = this->getNode().getPosition();
 	}
 	
 	//----------

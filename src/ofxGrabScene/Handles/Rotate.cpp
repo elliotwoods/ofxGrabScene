@@ -116,22 +116,19 @@ namespace GrabScene {
 		
 		ofNode & node(this->parent->getNode());
 		ofVec3f center = node.getPosition();
-		ofVec3f direction = this->getDirection() * node.getOrientationQuat();
+		ofVec3f direction = (this->getDirection() * node.getOrientationQuat()).normalized();
 		
-		//find element of vector perpendicular to direction
-		ofVec3f perp = cursor.worldViewFrameDifference;
-		perp -= perp.dot(direction) * direction;
+		ofVec3f centerToMouse = cursor.startWorld - center;
+		ofVec3f tangentDirection = centerToMouse.crossed(direction);
 		
-		ofVec3f v1, v2;
-		v1 = (cursor.startWorld - center).normalized();
-		v2 = (cursor.startWorld + perp - center).normalized();
-		ofQuaternion rotation;
-		rotation.makeRotate(v1,v2);
+		//find ray for positive rotation angle (starts at cursor, goes at tangent)
+		ofVec2f screenRayTangentS = cursor.startScreen;
+		ofVec2f screenRayTangentT = camera->worldToScreen(cursor.startWorld + tangentDirection) - screenRayTangentS;
+		screenRayTangentT.normalize();
 		
-		float angle;
-		ofVec3f direction2;
-		rotation.getRotate(angle, direction2);
-		if (direction2.dot(direction) < 0.0f)
+		float angle = screenRayTangentT.dot(cursor.getScreenFrameDifference());
+		
+		if (this->getDirection() != ofVec3f(1,0,0))
 			angle *= -1.0f;
 		
 		//check valid
