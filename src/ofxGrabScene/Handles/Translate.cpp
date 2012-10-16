@@ -109,6 +109,7 @@ namespace GrabScene {
 		
 		ofPushMatrix();
 		ofTranslate(parent->getNode().getPosition());
+		ofTranslate(parent->getNode().getOrientationQuat() * parent->getOrigin());
 		ofScale(scale, scale, scale);
 								 
 		ofPushStyle();
@@ -118,7 +119,7 @@ namespace GrabScene {
 		} else {
 			this->rotateAxis();
 			this->setStyleFill();
-			fill.draw();			
+			fill.draw();
 		}
 		ofPopStyle();
 		
@@ -141,6 +142,7 @@ namespace GrabScene {
 		
 		ofPushMatrix();
 		ofTranslate(parent->getNode().getPosition());
+		ofTranslate(parent->getNode().getOrientationQuat() * parent->getOrigin());
 		ofScale(scale, scale, scale);
 		
 		if (this->axis == NO_AXIS) {

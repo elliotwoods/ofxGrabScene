@@ -8,6 +8,7 @@
 #include <stdint.h>
 
 #include "ofMain.h"
+#include "ofxModifierKeys.h"
 #include "ofxGrabCam.h"
 
 #include "Node.h"
@@ -78,6 +79,7 @@ namespace GrabScene{
 		GLdouble projectionDoubles[16];
 		ofxGrabCam * camera;
 		GrabScene::MovingCursor cursor;
+		bool isSettingOrigin;
 		//
 		////
 		

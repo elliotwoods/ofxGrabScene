@@ -17,11 +17,11 @@ namespace GrabScene {
 			
 			
 			this->scale.set("Scale log10", 1.0f, -2.0f, 4.0f);
-			this->ticks.set("Ticks", 10, 1, 100);
+			this->ticks.set("Ticks", 2, 1, 100);
 			this->labels.set("Show labels", true);
-			this->showX.set("X", true);
+			this->showX.set("X", false);
 			this->showY.set("Y", true);
-			this->showZ.set("Z", true);
+			this->showZ.set("Z", false);
 			
 			this->setName("Grid");
 		}

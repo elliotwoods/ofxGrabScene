@@ -13,6 +13,7 @@ namespace GrabScene {
 		this->nodeSelected = 0;
 		this->initialised = false;
 		this->lockIndex = false;
+		this->isSettingOrigin = false;
 		
 		this->add(new NullElement());
 		this->add(new NullNode());
@@ -487,9 +488,13 @@ namespace GrabScene {
 			cursor.dragged = true;
 		}
 		
+		isSettingOrigin = ofGetModifierPressed(OF_KEY_ALT);
+		cursor.captured |= isSettingOrigin;
+		
 		if (cursor.captured) {
 			this->camera->setMouseActions(false);
 		}
+			
 		this->lockIndex = true;
 	}
 	
@@ -500,6 +505,7 @@ namespace GrabScene {
 		this->getElementUnderCursor().cursorReleased(this->cursor);
 		this->camera->setMouseActions(true);
 		this->lockIndex = false;
+		this->isSettingOrigin = false;
 		
 		//click
 		if (!this->cursor.dragged && this->elementUnderCursor==0) {
@@ -511,7 +517,11 @@ namespace GrabScene {
 	void Scene::mouseDragged(ofMouseEventArgs & args) {
 		if (this->cursor.captured) {
 			this->updateCursor();
-			this->getElementUnderCursor().cursorDragged(this->cursor);
+			if (this->isSettingOrigin && this->nodeSelected > 0 && this->nodeUnderCursor > 0) {
+				this->getSelectedNode().setOrigin(this->cursor.world * this->getSelectedNode().getNode().getGlobalTransformMatrix().getInverse());
+			} else {
+				this->getElementUnderCursor().cursorDragged(this->cursor);
+			}
 		}
 		this->cursor.dragged = true;
 	}

@@ -27,6 +27,9 @@ namespace GrabScene {
 		string getName() const;
 		void setName(const string &);
 		
+		void setOrigin(const ofVec3f &);
+		ofVec3f getOrigin() const;
+		
 		void updateTranslate();
 		void updateRotate();
 		ofParameterGroup parameters;
@@ -37,6 +40,7 @@ namespace GrabScene {
 		
 		ofParameter<ofVec3f> translate;
 		ofParameter<ofVec3f> rotate;
+		ofParameter<ofVec3f> origin;
 	};
 	
 	///This is the one you generally want to inherit from

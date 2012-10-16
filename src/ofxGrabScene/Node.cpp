@@ -18,6 +18,8 @@ namespace GrabScene {
 		//this->parameters.add(this->rotate);
 		this->translate.addListener(this, & BaseNode::translateCallback);
 		this->rotate.addListener(this, & BaseNode::rotateCallback);
+		
+		this->origin.set("Origin", ofVec3f(0.0f));
 	}
 
 	//----------
@@ -28,6 +30,16 @@ namespace GrabScene {
 	//----------
 	void BaseNode::setName(const string & name) {
 		return this->parameters.setName(name);
+	}
+	
+	//----------
+	void BaseNode::setOrigin(const ofVec3f & origin) {
+		this->origin = origin;
+	}
+	
+	//----------
+	ofVec3f BaseNode::getOrigin() const {
+		return this->origin;
 	}
 	
 	//----------
