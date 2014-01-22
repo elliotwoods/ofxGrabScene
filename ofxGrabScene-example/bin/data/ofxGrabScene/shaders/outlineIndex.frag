@@ -13,7 +13,7 @@ uniform int nodeHover = 0;
 uniform int elementCount = 10;
 
 const int spread = 2;
-const int step = 1;
+const int stride = 1;
 
 bool isElement(int index) {
 	return index < elementCount && index > 0;
@@ -38,8 +38,8 @@ void main() {
 	bool centerHover = centerNodeIndex == nodeHover;
 	//
 	float changes = 0.;
-	for (int x = -spread; x<= spread; x+=step) {
-		for (int y = -spread; y<= spread; y+=step) {
+	for (int x = -spread; x<= spread; x+=stride) {
+		for (int y = -spread; y<= spread; y+=stride) {
 			if (x == y)
 				continue;
 			
@@ -63,7 +63,7 @@ void main() {
 	////
 
 	vec4 col = vec4(1.);//
-	col.a = changes / (spread * spread * 4 / (step * step));
+	col.a = changes / (spread * spread * 4 / (stride * stride));
 	changes = 0;
 
 	////

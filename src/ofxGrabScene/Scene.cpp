@@ -43,7 +43,6 @@ namespace GrabScene {
 		
 		AssetRegister.init();
 		handles.init(camera);
-		inspector.setup();
 	}
 	
 	//----------
@@ -59,6 +58,7 @@ namespace GrabScene {
 		ofEnableAlphaBlending();
 		
 		this->drawNodesAndElements();
+		this->camera->updateCursorWorld();
 		this->drawIndexBuffer();
 		this->drawOutlines();
 		
@@ -150,7 +150,6 @@ namespace GrabScene {
 			this->nodeSelected = index;
 			
 			Handles::BaseHandle::setParent(this->getSelectedNode());
-			inspector.setTarget(this->getSelectedNode());
 			
 			if (index == 0)
 				Handles::BaseHandle::disable();
@@ -246,6 +245,12 @@ namespace GrabScene {
 			frameBuffer.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA, 4);
 		}
 		//
+		////
+		
+		this->camera->updateCursorWorld();
+		
+		////
+		//onTop elements
 		frameBuffer.bind();
 		ofClear(0,0,0,0);
 		for (itE = elements.begin(); itE != elements.end(); itE++) {
@@ -354,7 +359,7 @@ namespace GrabScene {
 	//----------
 	void Scene::drawOverlay() {
 		shader("noLight").begin();
-		inspector.draw();
+//		inspector.draw();
 		shader("noLight").end();
 	}
 	
@@ -479,14 +484,14 @@ namespace GrabScene {
 		
 		this->getElementUnderCursor().cursorDown(cursor);
 		
-		if (this->inspector.getShape().inside(this->cursor.screen.x, this->cursor.screen.y)) {
-			
-			//we're inside the gui
-			cursor.captured = true;
-			
-			//horrible hack to stop mouse clicks in gui affecting node selection
-			cursor.dragged = true;
-		}
+//		if (this->inspector.getShape().inside(this->cursor.screen.x, this->cursor.screen.y)) {
+//			
+//			//we're inside the gui
+//			cursor.captured = true;
+//			
+//			//horrible hack to stop mouse clicks in gui affecting node selection
+//			cursor.dragged = true;
+//		}
 		
 		isSettingOrigin = ofGetModifierPressed(OF_KEY_ALT);
 		cursor.captured |= isSettingOrigin;

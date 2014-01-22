@@ -16,7 +16,6 @@
 #include "Cursor.h"
 #include "Assets.h"
 #include "Handles.h"
-#include "Gui/Panel.h"
 
 #define GRABSCENE_INDEX_SCALE float(1 << 10)
 
@@ -146,14 +145,6 @@ namespace GrabScene{
 		void keyPressed(ofKeyEventArgs & args);
 		void keyReleased(ofKeyEventArgs & args);
 		void assetsLoad(Assets &);
-		//
-		////
-		
-		
-		////
-		//gui
-		//
-		Panel inspector;
 		//
 		////
 	};
